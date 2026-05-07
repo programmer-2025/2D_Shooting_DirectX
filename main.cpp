@@ -82,6 +82,8 @@ void Draw() {
 
 void Update() {
 	Input::update();
+	auto currentScene = SceneManager::GetCurrentScene();
+	currentScene->Update();
 }
 
 int initializeWindow(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {

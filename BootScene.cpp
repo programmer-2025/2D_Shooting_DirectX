@@ -28,6 +28,7 @@ BootScene::~BootScene() {
 
 void BootScene::Update() {
     counter_++;
+	texture->Update();
 }
 
 void BootScene::Draw() {

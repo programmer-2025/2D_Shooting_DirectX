@@ -1,5 +1,11 @@
 #pragma once
 #include "SceneBase.h"
+#include <DirectXMath.h>
+
+struct ConstantBuffer {
+    DirectX::XMMATRIX worldViewProj;
+};
+
 class BootScene : public SceneBase {
 private:
     int counter_;

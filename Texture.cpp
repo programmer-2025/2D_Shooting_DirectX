@@ -3,13 +3,24 @@
 #include <wincodec.h>
 #include <assert.h>
 #include <vector>
+#include "Input.h"
+#include <directxmath.h>
+#include "BootScene.h"
 
-Texture::Texture(std::string path, float leftX, float leftY)
+#pragma comment(lib, "d3d11.lib")
+#pragma comment(lib, "d3dcompiler.lib")
+
+using namespace DirectX;
+using namespace DirectX3D;
+
+Texture::Texture(const std::string path, const float leftX, const float leftY)
 	: BaseObject("Texture", true) {
 	path_ = path;
+	leftX_ = leftX;
+	leftY_ = leftY;
 
-	// スクリーン座標 → ワールド座標
-	vertices_[0] = { leftX, leftY + 1.0f, 0.0f, 0,1,0,1, 0, 0 }; // 左下 → 左上 
+	// スクリーン座標 → 画像の座標
+	vertices_[0] = { leftX, leftY + 1.0f, 0.0f, 0,1,0,1, 0, 0 }; // スクリーン座標: 左下 → 画像の座標: 左上 
 	vertices_[1] = { leftX, leftY, 0.0f, 1,0,0,1, 0, 1 }; // 左上 → 左下
 	vertices_[2] = { leftX + 1.0f, leftY, 0.0f, 1,1,0,1, 1, 1 }; // 右上 → 右下
 
@@ -105,12 +116,43 @@ void Texture::Init() {
 	D3D11_SUBRESOURCE_DATA bufferData = {};
 	bufferData.pSysMem = vertices_;
 
+	D3D11_BUFFER_DESC constantBufferDesc = {};
+	constantBufferDesc.ByteWidth = sizeof(ConstantBuffer);
+	constantBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	constantBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	DirectX3D::d3d11Device_->CreateBuffer(&constantBufferDesc, nullptr, &constantBuffer_);
+
 	DirectX3D::d3d11Device_->CreateBuffer(&bufferDesc, &bufferData, &vertexBuffer_);
 
 }
 
-void Texture::Update()
-{
+void Texture::Update() {
+	static float angle = 0.0f;
+	if (Input::IsPushKey(DIK_E)) {
+		leftY_ += 0.05f;
+		angle += 0.05f;
+	}
+	else if (Input::IsPushKey(DIK_D)) {
+		leftY_ -= 0.05f;
+		angle -= 0.05f;
+	}
+
+	auto world =
+		XMMatrixRotationZ(angle) *
+		XMMatrixTranslation(leftX_, leftY_, 0.0f);
+
+	auto proj = XMMatrixOrthographicOffCenterLH(
+		-1.0f, 1.0f, 
+		-1.0f, 1.0f, 
+		0.0f, 1.0f  
+	);
+
+	auto wvp = world * proj;
+
+	ConstantBuffer constantbuffer = {};
+	constantbuffer.worldViewProj = XMMatrixTranspose(wvp); // 行列を縦横を入れ替える
+
+	DirectX3D::d3d11Context_->UpdateSubresource(constantBuffer_, 0, nullptr, &constantbuffer, 0, 0);
 }
 
 void Texture::Draw() {
@@ -124,6 +166,7 @@ void Texture::Draw() {
 	DirectX3D::d3d11Context_->PSSetShader(DirectX3D::pixelShader, nullptr, 0);
 	DirectX3D::d3d11Context_->PSSetShaderResources(0, 1, &shaderResourceView_);
 	DirectX3D::d3d11Context_->PSSetSamplers(0, 1, &samplerState_);
+	DirectX3D::d3d11Context_->VSSetConstantBuffers(0, 1, &constantBuffer_);
 
 	D3D11_RASTERIZER_DESC rasterizerDesc = {};
 	rasterizerDesc.FillMode = D3D11_FILL_SOLID;
