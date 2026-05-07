@@ -8,6 +8,7 @@
 struct Vertex {
 	float x, y, z;
 	float r, g, b, a;
+	float u, v;
 };
 
 namespace DirectX3D {

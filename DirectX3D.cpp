@@ -71,7 +71,7 @@ void DirectX3D::initShader() {
 
 	//参考：https://learn.microsoft.com/ja-jp/windows/win32/api/d3dcompiler/nf-d3dcompiler-d3dcompilefromfile
 	result = D3DCompileFromFile(
-		L"TestPixelShader.hlsl", //シェーダーのファイル
+		L"TexturePixelShader.hlsl", //シェーダーのファイル
 		nullptr,
 		D3D_COMPILE_STANDARD_FILE_INCLUDE,
 		"main", //シェーダーのメイン関数
@@ -107,6 +107,7 @@ void DirectX3D::initShader() {
 	D3D11_INPUT_ELEMENT_DESC layout[] = {
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,    0, 0,                          D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, UINT(3 * sizeof(float)),    D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{"TEXCOORD",       0, DXGI_FORMAT_R32G32_FLOAT,       0, UINT(7 * sizeof(float)),    D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 
 	result = DirectX3D::d3d11Device_->CreateInputLayout(
