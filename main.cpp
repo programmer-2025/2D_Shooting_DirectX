@@ -59,12 +59,12 @@ void Draw() {
 	float color[4] = { 1, 1, 1, 1.0f };
 	DirectX3D::d3d11Context_->OMSetRenderTargets(1, &renderTargetView_, nullptr);
 	DirectX3D::d3d11Context_->ClearRenderTargetView(renderTargetView_, color);
-	SceneManager::DrawScene();
-	ObjectManager::UpdateManager();
-
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
+
+	SceneManager::DrawScene();
+	ObjectManager::UpdateManager();
 
 	auto currentScene = SceneManager::GetCurrentScene();
 	ImGui::Begin("Game");
@@ -141,12 +141,9 @@ int initializeWindow(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 			DispatchMessage(&msg);
 		}
 		else {
+
+
 			Update();
-			if (Input::IsPushKey(DIK_0)) {
-				TranslateMessage(&msg);
-				DispatchMessage(&msg);
-				break;
-			}
 			Draw();
 		}
 	}
