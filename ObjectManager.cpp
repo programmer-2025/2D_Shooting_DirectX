@@ -31,6 +31,7 @@ void ObjectManager::UpdateManager() {
         if (obj == nullptr) continue;
         if (obj->IsAlive()) {
             obj->Update();
+            if (!obj->IsShowing()) return;
             obj->Draw();
         }
         else {

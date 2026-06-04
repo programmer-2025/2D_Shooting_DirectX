@@ -6,6 +6,7 @@ private:
 protected:
     std::string name_;
     bool isAlive_;
+    bool isShowing_;
 public:
     virtual void Init() = 0;
     virtual void Update() = 0;
@@ -17,4 +18,7 @@ public:
 
     std::string GetName() { return name_; };
     bool IsAlive() { return isAlive_; };
+    void KillMe() { this->isAlive_ = true; }
+    bool IsShowing() { return isShowing_; }
+    void SetShowing(const bool flag) { this->isShowing_ = flag; }
 };
