@@ -1,6 +1,19 @@
 #include "FBX.h"
 #include "fbxsdk.h"
 #include "DirectX3D.h"
+#include "BootScene.h"
+#include "Texture.h"
+#include <vector>
+
+using namespace fbxsdk;
+
+namespace {
+	FbxNode* rootNode = nullptr;
+	FbxNode* node = nullptr; //結合済み前提
+	FbxMesh* mesh = nullptr;
+	int indexCount_ = 0;
+}
+
 
 FBX::FBX()
 	: BaseObject("FBX", true) {
@@ -18,16 +31,31 @@ HRESULT FBX::Load(const std::string fName) {
 	fbxImporter->Import(fbxScene);
 	fbxImporter->Destroy();
 
-	FbxNode* rootNode = fbxScene->GetRootNode();
-	FbxNode* node = rootNode->GetChild(0); //結合済み前提
-	FbxMesh* mesh = node->GetMesh();
+	rootNode = fbxScene->GetRootNode();
+	
+	auto a = rootNode->GetChildCount();
+
+	for (int i = 0; i < rootNode->GetChildCount(); i++)
+	{
+		FbxNode* child = rootNode->GetChild(i);
+
+		auto ii = child->GetName();
+
+		auto uu = child->GetMesh();
+	}
+
+	node = rootNode->GetChild(0); //結合済み前提
+	mesh = node->GetMesh();
 
 	vertexCount_ = mesh->GetControlPointsCount();
 	polygonCount_ = mesh->GetPolygonCount();
+	materialCount_ = node->GetMaterialCount();
 
 	InitVertex(mesh);
 	InitIndex(mesh);
 	InitConstantBuffer();
+
+	return S_OK;
 }
 
 void FBX::Init()
@@ -44,6 +72,16 @@ void FBX::InitVertex(FbxMesh* mesh) {
 
 		}
 	}
+
+	D3D11_BUFFER_DESC bd = {};
+	bd.Usage = D3D11_USAGE_DEFAULT;
+	bd.ByteWidth = sizeof(VERTEX) * vertexCount_;
+	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+
+	D3D11_SUBRESOURCE_DATA data = {};
+	data.pSysMem = vertices;
+
+	HRESULT hr = DirectX3D::d3d11Device_->CreateBuffer(&bd, &data, &pVertexBuffer_);
 }
 
 void FBX::InitIndex(FbxMesh* mesh) {
@@ -56,20 +94,56 @@ void FBX::InitIndex(FbxMesh* mesh) {
 			count++;
 		}
 	}
+
+	D3D11_BUFFER_DESC bd = {};
+	bd.ByteWidth = sizeof(int) * polygonCount_ * 3;
+	bd.Usage = D3D11_USAGE_DEFAULT;
+	bd.BindFlags = D3D11_BIND_INDEX_BUFFER;
+
+	D3D11_SUBRESOURCE_DATA data = {};
+	data.pSysMem = index;
+
+	HRESULT hr = DirectX3D::d3d11Device_->CreateBuffer(&bd, &data, &pIndexBuffer_);
 }
 
 void FBX::InitConstantBuffer() {
-	constantbuffer.worldViewProj = XMMatrixTranspose(wvp); // 行列を縦横を入れ替える
-
-	DirectX3D::d3d11Context_->UpdateSubresource(constantBuffer_, 0, nullptr, &constantbuffer, 0, 0);
+	D3D11_BUFFER_DESC constantBufferDesc = {};
+	constantBufferDesc.ByteWidth = sizeof(ConstantBuffer);
+	constantBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	constantBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	HRESULT hr = DirectX3D::d3d11Device_->CreateBuffer(&constantBufferDesc, nullptr, &pConstantBuffer_);
 }
 
-void FBX::Update()
-{
+void FBX::Update() {
+	ConstantBuffer cb = {};
+	DirectX::XMMATRIX world = DirectX::XMMatrixIdentity();
+	DirectX::XMMATRIX view = DirectX::XMMatrixIdentity();
+	DirectX::XMMATRIX projection = DirectX::XMMatrixIdentity();
+
+	cb.worldViewProj = world * view * projection;
+
+	DirectX3D::d3d11Context_->UpdateSubresource(pConstantBuffer_, 0, nullptr, &cb, 0, 0);
 }
 
-void FBX::Draw()
-{
+void FBX::Draw() {
+	UINT stride = sizeof(VERTEX);
+	UINT offset = 0;
+
+	DirectX3D::d3d11Context_->VSSetShader(DirectX3D::vertexShader, nullptr, 0);
+	DirectX3D::d3d11Context_->PSSetShader(DirectX3D::pixelShader, nullptr, 0);
+	DirectX3D::d3d11Context_->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	DirectX3D::d3d11Context_->IASetVertexBuffers(0, 1, &pVertexBuffer_, &stride, &offset);
+	DirectX3D::d3d11Context_->IASetIndexBuffer(pIndexBuffer_, DXGI_FORMAT_R32_UINT, 0);
+	DirectX3D::d3d11Context_->VSSetConstantBuffers(0, 1, &pConstantBuffer_);
+	D3D11_RASTERIZER_DESC rasterizerDesc = {};
+	rasterizerDesc.FillMode = D3D11_FILL_SOLID;
+	rasterizerDesc.CullMode = D3D11_CULL_NONE;
+	rasterizerDesc.FrontCounterClockwise = FALSE;
+	ID3D11RasterizerState* rasterizerState = nullptr;
+	DirectX3D::d3d11Device_->CreateRasterizerState(&rasterizerDesc, &rasterizerState);
+	DirectX3D::d3d11Context_->RSSetState(rasterizerState);
+	DirectX3D::d3d11Context_->DrawIndexed(polygonCount_ * 3, 0, 0);
+	DirectX3D::d3d11Context_->RSSetState(nullptr);
 }
 
 void FBX::Release()

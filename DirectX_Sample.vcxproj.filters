@@ -102,6 +102,9 @@
     <ClCompile Include="Player.cpp">
       <Filter>ソース ファイル\Object</Filter>
     </ClCompile>
+    <ClCompile Include="FBX.cpp">
+      <Filter>ソース ファイル\Object</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImGUI\imgui.h">
@@ -180,6 +183,9 @@
       <Filter>ソース ファイル\Manager</Filter>
     </ClInclude>
     <ClInclude Include="Player.h">
+      <Filter>ソース ファイル\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="FBX.h">
       <Filter>ソース ファイル\Object</Filter>
     </ClInclude>
   </ItemGroup>
