@@ -4,8 +4,10 @@
 #include "BootScene.h"
 #include "Texture.h"
 #include <vector>
+#include "ImGUI/imgui.h"
 
 using namespace fbxsdk;
+using namespace DirectX;
 
 namespace {
 	FbxNode* rootNode = nullptr;
@@ -115,12 +117,21 @@ void FBX::InitConstantBuffer() {
 }
 
 void FBX::Update() {
+	static float angle = 0.0f;
+	static float leftX = 0.0f, leftY = 0.0f, z = 0.0f;
 	ConstantBuffer cb = {};
-	DirectX::XMMATRIX world = DirectX::XMMatrixIdentity();
+	DirectX::XMMATRIX world = XMMatrixScaling(0.5, 0.5, 0.5) * (XMMatrixRotationZ(angle)) * XMMatrixTranslation(leftX, leftY, z);
 	DirectX::XMMATRIX view = DirectX::XMMatrixIdentity();
 	DirectX::XMMATRIX projection = DirectX::XMMatrixIdentity();
 
-	cb.worldViewProj = world * view * projection;
+	cb.worldViewProj = XMMatrixTranspose(world * view * projection);
+
+	ImGui::Begin("FBX");
+	ImGui::SliderFloat("X", &leftX, -1.0f, 1.0f);
+	ImGui::SliderFloat("Y", &leftY, -1.0f, 1.0f);
+	ImGui::SliderFloat("Z", &z, -1.0f, 1.0f);
+	ImGui::SliderFloat("angle", &angle, -1.0f, 1.0f);
+	ImGui::End();
 
 	DirectX3D::d3d11Context_->UpdateSubresource(pConstantBuffer_, 0, nullptr, &cb, 0, 0);
 }
