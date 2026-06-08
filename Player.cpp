@@ -20,12 +20,10 @@ void Player::Update() {
 	if (texture == nullptr) return;
 
 	if (Input::IsPushKey(DIK_E)) {
-		texture->leftY_ += 0.05f;
-		texture->angle += 0.05f;
+
 	}
 	else if (Input::IsPushKey(DIK_D)) {
-		texture->leftY_ -= 0.05f;
-		texture->angle -= 0.05f;
+
 	}
 }
 

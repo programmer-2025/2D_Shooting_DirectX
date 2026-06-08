@@ -21,8 +21,6 @@ private:
 	Vertex vertices_[6];
 	DirectX::XMMATRIX matrix_;
 public:
-	float leftX_, leftY_;
-	float angle;
 	Texture(std::string path, float leftX, float leftY);
 	~Texture() {};
 	void Init() override;

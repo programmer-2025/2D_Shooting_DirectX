@@ -17,8 +17,6 @@ using namespace DirectX3D;
 Texture::Texture(const std::string path, const float leftX, const float leftY)
 	: BaseObject("Texture", true) {
 	path_ = path;
-	leftX_ = leftX;
-	leftY_ = leftY;
 
 	// スクリーン座標 → 画像の座標
 	vertices_[0] = { leftX, leftY + 1.0f, 0.0f, 0,1,0,1, 0, 0 }; // スクリーン座標: 左下 → 画像の座標: 左上 
@@ -128,31 +126,33 @@ void Texture::Init() {
 }
 
 void Texture::Update() {
-	auto world =
-		XMMatrixRotationZ(angle) *
-		XMMatrixTranslation(leftX_, leftY_, 0.0f);
-
-	static float viewLeft = -1.0f, viewRight = 1.0f, viewBottom = -1.0f, viewTop = 1.0f, NearZ = 0.0f, FarZ = 1.0f;
-	auto proj = XMMatrixOrthographicOffCenterLH(
-		viewLeft, viewRight, viewBottom, viewTop, NearZ, FarZ
+	XMMATRIX scaleMat = XMMatrixScaling(scale_.x, scale_.y, scale_.z);
+	XMMATRIX rotMat = XMMatrixRotationZ(rotation_.z) * XMMatrixRotationX(rotation_.x) * XMMatrixRotationY(rotation_.y);
+	XMMATRIX transMat = XMMatrixTranslation(postion_.x, postion_.y, postion_.z);
+	XMMATRIX world = scaleMat * rotMat * transMat;
+	XMMATRIX view = DirectX::XMMatrixLookAtLH(
+		XMVectorSet(0.0f, 0.0f, -5.0f, 1.0f), //EyeLocation（※カメラの位置）
+		XMVectorSet(0.0f, 2.0f, 0.0f, 1.0f), //FoucusPostion（※注視点）
+		XMVectorSet(0.0f, 1.0f, 0.0f, 1.0f)  //カメラの上方向
 	);
+	XMMATRIX projection = DirectX::XMMatrixPerspectiveFovLH(XMConvertToRadians(90.0f), 1280.0f / 720.0f, 0.1f, 100.0f);
 
-	auto wvp = world;
+	ConstantBuffer cb = {};
+	cb.worldViewProj = XMMatrixTranspose(world * view * projection);
 
-	ConstantBuffer constantbuffer = {};
-	constantbuffer.worldViewProj = XMMatrixTranspose(wvp); // 行列を縦横を入れ替える
-
-	DirectX3D::d3d11Context_->UpdateSubresource(constantBuffer_, 0, nullptr, &constantbuffer, 0, 0);
-
-	ImGui::Begin("Player");
-	ImGui::SliderFloat("X", &leftX_, -1.0, 1.0);
-	ImGui::SliderFloat("Y", &leftY_, -1.0, 1.0);
-
-	ImGui::SliderFloat("Left", &viewLeft, -1.0, 1.0);
-	ImGui::SliderFloat("Right", &viewRight, -1.0, 1.0);
-	ImGui::SliderFloat("Bottom", &viewBottom, -1.0, 1.0);
-	ImGui::SliderFloat("Top", &viewTop, -1.0, 1.0);
+	ImGui::Begin("Texture");
+	ImGui::SliderFloat("X", &postion_.x, -1.0f, 1.0f);
+	ImGui::SliderFloat("Y", &postion_.y, -1.0f, 1.0f);
+	ImGui::SliderFloat("Z", &postion_.z, -1.0f, 1.0f);
+	ImGui::SliderFloat("angleX", &rotation_.x, -1.0f, 1.0f);
+	ImGui::SliderFloat("angleY", &rotation_.y, -1.0f, 1.0f);
+	ImGui::SliderFloat("angleZ", &rotation_.z, -1.0f, 1.0f);
+	ImGui::SliderFloat("scaleX", &scale_.x, 0.5f, 2.0f);
+	ImGui::SliderFloat("scaleY", &scale_.y, 0.5f, 2.0f);
+	ImGui::SliderFloat("scaleZ", &scale_.z, 0.5f, 2.0f);
 	ImGui::End();
+
+	DirectX3D::d3d11Context_->UpdateSubresource(constantBuffer_, 0, nullptr, &cb, 0, 0);
 }
 
 void Texture::Draw() {
