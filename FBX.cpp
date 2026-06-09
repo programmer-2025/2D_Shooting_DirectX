@@ -5,6 +5,7 @@
 #include "Texture.h"
 #include <vector>
 #include "ImGUI/imgui.h"
+#include "Camera.h"
 
 using namespace fbxsdk;
 using namespace DirectX;
@@ -112,11 +113,7 @@ void FBX::Update() {
 	XMMATRIX rotMat = XMMatrixRotationZ(rotation_.z) * XMMatrixRotationX(rotation_.x) * XMMatrixRotationY(rotation_.y);
 	XMMATRIX transMat = XMMatrixTranslation(postion_.x, postion_.y, postion_.z);
 	XMMATRIX world = scaleMat * rotMat * transMat;
-	XMMATRIX view = DirectX::XMMatrixLookAtLH(
-		XMVectorSet(0.0f, 0.0f, -5.0f, 1.0f), //EyeLocation（※カメラの位置）
-		XMVectorSet(0.0f, 2.0f, 0.0f, 1.0f), //FoucusPostion（※注視点）
-		XMVectorSet(0.0f, 1.0f, 0.0f, 1.0f)  //カメラの上方向
-	);
+	XMMATRIX view = CameraManager::getCurentCamera()->getMatrix();
 	XMMATRIX projection = DirectX::XMMatrixPerspectiveFovLH(XMConvertToRadians(90.0f), 1280.0f / 720.0f, 0.1f, 100.0f);
 
 	ConstantBuffer cb = {};

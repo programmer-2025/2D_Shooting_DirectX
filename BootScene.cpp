@@ -6,8 +6,11 @@
 #include "Texture.h"
 #include "Player.h"
 #include "FBX.h"
+#include "ImGUI/imgui.h"
+#include "Camera.h"
 
 using namespace DirectX3D;
+using namespace DirectX;
 
 BootScene::BootScene()
     : SceneBase("BootScene") {
@@ -27,6 +30,22 @@ void BootScene::Update() {
 }
 
 void BootScene::Draw() {
+    Camera* currentCamera = CameraManager::getCurentCamera();
+    DirectX::XMFLOAT3 cameraPos = currentCamera->getCameraPostion();
+    DirectX::XMFLOAT3 targetPos = currentCamera->getFoucsPostion();
+
+    ImGui::Begin("BootScene");
+    ImGui::SliderFloat("cameraPosX", &cameraPos.x, -20.0f, 20.0f);
+	ImGui::SliderFloat("cameraPosY", &cameraPos.y, -20.0f, 20.0f);
+	ImGui::SliderFloat("cameraPosZ", &cameraPos.z, -20.0f, 20.0f);
+	ImGui::SliderFloat("targetPosX", &targetPos.x, -20.0f, 20.0f);
+	ImGui::SliderFloat("targetPosY", &targetPos.y, -20.0f, 20.0f);
+	ImGui::SliderFloat("targetPosZ", &targetPos.z, -20.0f, 20.0f);
+    ImGui::End();
+
+	currentCamera->setCameraPostion(cameraPos);
+	currentCamera->setFoucsPostion(targetPos);
+	CameraManager::setCurentCamera(currentCamera);
 }
 
 void BootScene::Init() {
