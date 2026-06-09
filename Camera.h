@@ -1,23 +1,30 @@
 #pragma once
 #include <DirectXMath.h>
+#include <string>
 
 class Camera {
 private:
+	std::string name_;
 	DirectX::XMFLOAT3 cameraPostion_;
 	DirectX::XMFLOAT3 foucusPostion_;
 	DirectX::XMFLOAT3 upDirection_;
 public:
 
-	Camera() {
+	Camera(std::string name) {
+		name_ = name;
 		cameraPostion_ = { 0.0f, 0.0f, -5.0f};
 		foucusPostion_ = { 0.0f, 2.0f, 0.0f };
 		upDirection_ = { 0.0f, 1.0f, 0.0f };
 	}
 
-	Camera(DirectX::XMFLOAT3 cameraPos, DirectX::XMFLOAT3 foucusPos) {
+	Camera(std::string name, DirectX::XMFLOAT3 cameraPos, DirectX::XMFLOAT3 foucusPos) {
+		name_ = name;
 		this->cameraPostion_ = cameraPos;
 		this->foucusPostion_ = foucusPos;
+		this->upDirection_ = { 0.0f, 1.0f, 0.0f };
 	}
+
+	inline std::string getName() { return name_; }
 
 	inline DirectX::XMMATRIX getMatrix() {
 		return DirectX::XMMatrixLookAtLH(
@@ -45,7 +52,9 @@ public:
 };
 
 namespace CameraManager {
-	void setCurentCamera(Camera* camera);
+	void addCamera(std::string name, Camera* camera);
+	void setCurentCamera(std::string name);
+	Camera* getCamera(std::string name);
 	Camera* getCurentCamera();
 }
 

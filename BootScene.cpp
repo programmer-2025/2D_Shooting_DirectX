@@ -37,6 +37,7 @@ void BootScene::Draw() {
     DirectX::XMFLOAT3 targetPos = currentCamera->getFoucsPostion();
 
     ImGui::Begin("BootScene");
+	ImGui::Text("Camera Name: %s", currentCamera->getName().c_str());
     ImGui::SliderFloat("cameraPosX", &cameraPos.x, -20.0f, 20.0f);
 	ImGui::SliderFloat("cameraPosY", &cameraPos.y, -20.0f, 20.0f);
 	ImGui::SliderFloat("cameraPosZ", &cameraPos.z, -20.0f, 20.0f);
@@ -47,11 +48,12 @@ void BootScene::Draw() {
 
 	currentCamera->setCameraPostion(cameraPos);
 	currentCamera->setFoucsPostion(targetPos);
-	CameraManager::setCurentCamera(currentCamera);
 }
 
 void BootScene::Init() {
     counter_ = 0;
+	CameraManager::addCamera("rootCamera", new Camera("rootCamera"));
+    CameraManager::setCurentCamera("rootCamera");
 }
 
 void BootScene::Release() {
