@@ -15,12 +15,14 @@ private:
 	UINT width_, height_;
 	std::string path_;
 	
+
+public:
 	ID3D11SamplerState* samplerState_;
 	ID3D11ShaderResourceView* shaderResourceView_;
 	ID3D11Buffer* constantBuffer_;
 	Vertex vertices_[6];
 	DirectX::XMMATRIX matrix_;
-public:
+
 	Texture(std::string path, float leftX, float leftY);
 	~Texture() {};
 	void Init() override;

@@ -48,6 +48,7 @@ HRESULT FBX::Load(const std::string fName) {
 	InitVertex(mesh);
 	InitIndex(mesh);
 	InitConstantBuffer();
+	InitMaterial(node);
 
 	return S_OK;
 }
@@ -57,19 +58,28 @@ void FBX::Init()
 }
 
 void FBX::InitVertex(FbxMesh* mesh) {
-	VERTEX* vertices = new VERTEX[vertexCount_]; //頂点
+	Vertex* vertices = new Vertex[vertexCount_](); //頂点
+
 	for (DWORD poly = 0; poly < polygonCount_; poly++) {
 		for (int vertex = 0; vertex < 3; vertex++) {
 			int index = mesh->GetPolygonVertex(poly, vertex);
 			FbxVector4 pos = mesh->GetControlPointAt(index);
-			vertices[index].position = DirectX::XMVectorSet((float)pos[0], (float)pos[1], (float)pos[2], 0.0f);
+			vertices[index].x = (float)pos[0];
+			vertices[index].y = (float)pos[1];
+			vertices[index].z = (float)pos[2];
 
+			FbxLayerElementUV* uvLayer = mesh->GetLayer(0)->GetUVs();
+			int uvIndex = mesh->GetTextureUVIndex(poly, vertex);
+			FbxVector2 uv = uvLayer->GetDirectArray().GetAt(uvIndex);
+
+			vertices[index].u = (float)uv.mData[0];
+			vertices[index].v = (float)(1.0f - uv.mData[1]);
 		}
 	}
 
 	D3D11_BUFFER_DESC bd = {};
 	bd.Usage = D3D11_USAGE_DEFAULT;
-	bd.ByteWidth = sizeof(VERTEX) * vertexCount_;
+	bd.ByteWidth = sizeof(Vertex) * vertexCount_;
 	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 
 	D3D11_SUBRESOURCE_DATA data = {};
@@ -79,25 +89,35 @@ void FBX::InitVertex(FbxMesh* mesh) {
 }
 
 void FBX::InitIndex(FbxMesh* mesh) {
+	pIndexBuffer_ = new ID3D11Buffer*[materialCount_];
 	int* index = new int[polygonCount_ * 3];
-	int count = 0;
 
-	for (DWORD poly = 0; poly < polygonCount_; poly++) {
-		for (DWORD vertex = 0; vertex < 3; vertex++) {
-			index[count] = mesh->GetPolygonVertex(poly, vertex);
-			count++;
+	for (int i = 0; i < materialCount_; i++) {
+		int count = 0;
+
+		for (DWORD poly = 0; poly < polygonCount_; poly++) {
+			FbxLayerElementMaterial* materialLayer = mesh->GetLayer(0)->GetMaterials();
+			int materialId = materialLayer->GetIndexArray().GetAt(poly);
+
+			if (materialId == i) {
+				for (DWORD vertex = 0; vertex < 3; vertex++) {
+					index[count] = mesh->GetPolygonVertex(poly, vertex);
+					count++;
+				}
+			}
+
 		}
+
+		D3D11_BUFFER_DESC bd = {};
+		bd.ByteWidth = sizeof(int) * polygonCount_ * 3;
+		bd.Usage = D3D11_USAGE_DEFAULT;
+		bd.BindFlags = D3D11_BIND_INDEX_BUFFER;
+
+		D3D11_SUBRESOURCE_DATA data = {};
+		data.pSysMem = index;
+
+		HRESULT hr = DirectX3D::d3d11Device_->CreateBuffer(&bd, &data, &pIndexBuffer_[i]);
 	}
-
-	D3D11_BUFFER_DESC bd = {};
-	bd.ByteWidth = sizeof(int) * polygonCount_ * 3;
-	bd.Usage = D3D11_USAGE_DEFAULT;
-	bd.BindFlags = D3D11_BIND_INDEX_BUFFER;
-
-	D3D11_SUBRESOURCE_DATA data = {};
-	data.pSysMem = index;
-
-	HRESULT hr = DirectX3D::d3d11Device_->CreateBuffer(&bd, &data, &pIndexBuffer_);
 }
 
 void FBX::InitConstantBuffer() {
@@ -106,6 +126,23 @@ void FBX::InitConstantBuffer() {
 	constantBufferDesc.Usage = D3D11_USAGE_DEFAULT;
 	constantBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	HRESULT hr = DirectX3D::d3d11Device_->CreateBuffer(&constantBufferDesc, nullptr, &pConstantBuffer_);
+}
+
+void FBX::InitMaterial(fbxsdk::FbxNode* node) {
+	materials_ = new MATERIAL[materialCount_];
+	for (int i = 0; i < materialCount_; i++) {
+		FbxSurfaceMaterial* material = node->GetMaterial(i);
+		FbxProperty property = material->FindProperty(FbxSurfaceMaterial::sDiffuse);
+		int fileTextureCount = property.GetSrcObjectCount <FbxFileTexture>();
+		if (fileTextureCount > 0) {
+			FbxFileTexture* textureInfo = property.GetSrcObject<FbxFileTexture>();
+			const char* texturePath = textureInfo->GetFileName();
+			materials_[i].texture = new Texture(texturePath, -0.5f, 0.5f);
+		}
+		else {
+			materials_[i].texture = nullptr;
+		}
+	}
 }
 
 void FBX::Update() {
@@ -135,19 +172,20 @@ void FBX::Update() {
 }
 
 void FBX::Draw() {
-	UINT stride = sizeof(VERTEX);
+	UINT stride = sizeof(Vertex);
 	UINT offset = 0;
-	ID3D11ShaderResourceView* srv[1] = { nullptr };
-	ID3D11SamplerState* sampler[1] = { nullptr };
-
-	DirectX3D::d3d11Context_->PSSetShaderResources(0, 1, srv);
-	DirectX3D::d3d11Context_->PSSetSamplers(0, 1, sampler);
 
 	DirectX3D::d3d11Context_->VSSetShader(DirectX3D::vertexShader, nullptr, 0);
 	DirectX3D::d3d11Context_->PSSetShader(DirectX3D::pixelShader, nullptr, 0);
 	DirectX3D::d3d11Context_->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	DirectX3D::d3d11Context_->IASetVertexBuffers(0, 1, &pVertexBuffer_, &stride, &offset);
-	DirectX3D::d3d11Context_->IASetIndexBuffer(pIndexBuffer_, DXGI_FORMAT_R32_UINT, 0);
+	for (int i = 0; i < materialCount_; i++) {
+		if (materials_[i].texture != nullptr) {
+			DirectX3D::d3d11Context_->IASetIndexBuffer(pIndexBuffer_[i], DXGI_FORMAT_R32_UINT, 0);
+			DirectX3D::d3d11Context_->PSSetShaderResources(0, 1, &materials_[i].texture->shaderResourceView_);
+			DirectX3D::d3d11Context_->PSSetSamplers(0, 1, &materials_[i].texture->samplerState_);
+		}
+	}
 	DirectX3D::d3d11Context_->VSSetConstantBuffers(0, 1, &pConstantBuffer_);
 	D3D11_RASTERIZER_DESC rasterizerDesc = {};
 	rasterizerDesc.FillMode = D3D11_FILL_SOLID;

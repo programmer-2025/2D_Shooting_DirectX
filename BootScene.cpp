@@ -16,7 +16,7 @@ BootScene::BootScene()
     : SceneBase("BootScene") {
     //new Box2D(-0.5f, 0.5f, 1.0f, -1.0f);
     //new Box2D(-0.7f, 0.5f, 0.1f, -1.0f);
-    new Player();
+    //new Player();
     auto fbx = (new FBX());
     fbx->Load("Oden.fbx");
     assert(DirectX3D::swapChain_);
