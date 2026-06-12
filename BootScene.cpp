@@ -9,6 +9,7 @@
 #include "ImGUI/imgui.h"
 #include "Camera.h"
 #include "FontText.h"
+#include "SceneManager.h"
 
 using namespace DirectX3D;
 using namespace DirectX;
@@ -23,6 +24,7 @@ BootScene::~BootScene() {
 
 void BootScene::Update() {
     counter_++;
+    SceneManager::ChangeScene("TitleScene");
 }
 
 void BootScene::Draw() {

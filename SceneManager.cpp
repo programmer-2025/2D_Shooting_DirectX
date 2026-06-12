@@ -3,6 +3,9 @@
 #include "BootScene.h"
 #include <vector>
 #include "ObjectManager.h"
+#include "TitleScene.h"
+#include "RunningScene.h"
+#include "ClearScene.h"
 
 namespace {
 	std::vector<SceneBase*> sceneList;
@@ -14,7 +17,13 @@ namespace SceneManager {
 	void InitManager() {
 		sceneList.clear();
 		auto bootScene = new BootScene();
+		auto titleScene = new TitleScene();
+		auto runningScene = new RunningScene();
+		auto clearScene = new ClearScene();
 		sceneList.push_back(bootScene);
+		sceneList.push_back(titleScene);
+		sceneList.push_back(runningScene);
+		sceneList.push_back(clearScene);
 		ChangeScene("BootScene");
 	}
 
