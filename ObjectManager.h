@@ -2,11 +2,8 @@
 #include <vector>
 #include "BaseObject.h"
 
-namespace {
-    std::vector<BaseObject*> objList;
-}
-
 namespace ObjectManager {
+    inline std::vector<BaseObject*> objList;
 
     void InitManager();
     void AddObject(BaseObject* obj);
@@ -14,10 +11,10 @@ namespace ObjectManager {
     void ClearObject();
     void UpdateManager();
 
-    template<class C> C* GetDrawObject() {
+    template<class T> T* GetDrawObject() {
         for (BaseObject* obj : objList) {
             if (obj == nullptr) continue;
-            C* instance = dynamic_cast<C*>(obj);
+            T* instance = dynamic_cast<T*>(obj);
             if (instance != nullptr) {
                 return instance;
             }
