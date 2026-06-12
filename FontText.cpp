@@ -51,7 +51,8 @@ void FontText::Draw()
 {
 	D2D1_SIZE_F size = DirectX2D::renderTarget->GetSize();
 	DirectX2D::renderTarget->BeginDraw();
-	DirectX2D::renderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
+	D2D1_MATRIX_3X2_F transform_ = D2D1::Matrix3x2F::Scale(scale_.x, scale_.y) * D2D1::Matrix3x2F::Rotation(rotation_.z) * D2D1::Matrix3x2F::Translation(postion_.x, postion_.y);
+	DirectX2D::renderTarget->SetTransform(transform_);
 
 	DirectX2D::renderTarget->DrawTextW(
 		text_.c_str(),
@@ -66,6 +67,8 @@ void FontText::Draw()
 	ImGui::Begin("FontText");
 	ImGui::SliderFloat("X", &postion_.x, 0, (int)size.width);
 	ImGui::SliderFloat("Y", &postion_.y, -1280, (int)size.height);
+	ImGui::SliderFloat("ScaleX", &scale_.x, 0.1f, 5.0f);
+	ImGui::SliderFloat("ScaleY", &scale_.y, 0.1f, 5.0f);
 	ImGui::End();
 }
 
