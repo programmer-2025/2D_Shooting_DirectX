@@ -1,5 +1,6 @@
 #include "FontText.h"
 #include "DirectX2D.h"
+#include "ImGui/imgui.h"
 
 FontText::FontText(std::wstring text)
 	: BaseObject("FontText", true) {
