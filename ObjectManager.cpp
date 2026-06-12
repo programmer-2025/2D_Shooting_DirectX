@@ -29,7 +29,8 @@ void ObjectManager::ClearObject() {
 }
 
 void ObjectManager::UpdateManager() {
-    for (auto& obj : objList) {
+    for (int n = 0; n < objList.size(); n++) {
+        auto obj = objList[n];
         if (obj == nullptr) continue;
         if (obj->IsAlive()) {
             obj->Update();
