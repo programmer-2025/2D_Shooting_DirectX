@@ -14,14 +14,15 @@ Bullet::Bullet()
 void Bullet::Init() {
 	texture = new Image("Bullet.png", -0.5f, -0.5f);
 	texture->Init();
+	postion_ = texture->GetPosition();
+	rotation_ = texture->GetRotation();
 }
 
 void Bullet::Update() {
 	if (texture == nullptr) return;
-	auto postion = texture->GetPosition();
-	postion.y += SPEED;
+	postion_.y += SPEED;
 
-	texture->SetPosition(postion);
+	texture->SetPosition(postion_);
 }
 
 void Bullet::Draw() {

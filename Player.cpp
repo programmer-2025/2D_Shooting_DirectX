@@ -22,7 +22,14 @@ void Player::Init() {
 void Player::Update() {
 	if (texture == nullptr) return;
 	auto postion = texture->GetPosition();
+	auto rotation = texture->GetRotation();
 
+	if (Input::IsPushKey(DIK_A)) {
+		postion.x -= SPEED;
+	}
+	if (Input::IsPushKey(DIK_D)) {
+		postion.x += SPEED;
+	}
 	if (Input::IsPushKey(DIK_W)) {
 		postion.y += SPEED;
 	}
@@ -30,15 +37,24 @@ void Player::Update() {
 		postion.y -= SPEED;
 	}
 
+	if (Input::IsPushKey(DIK_LEFT)) {
+		rotation.z += SPEED;
+	}
+	if (Input::IsPushKey(DIK_RIGHT)) {
+		rotation.z -= SPEED;
+	}
+
 	static bool beforeKey = false;
 	if (Input::IsPushKey(DIK_SPACE) && !beforeKey) {
 		Bullet* bullet = new Bullet();
 		bullet->Init();
+		bullet->SetPosition(postion);
 	}
 	beforeKey = Input::IsPushKey(DIK_SPACE);
 	
 
 	texture->SetPosition(postion);
+	texture->SetRotation(rotation);
 }
 
 void Player::Draw(){
