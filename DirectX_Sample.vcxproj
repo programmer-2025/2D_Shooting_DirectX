@@ -142,6 +142,7 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="ClearScene.cpp" />
     <ClCompile Include="DirectX2D.cpp" />
+    <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="FBX.cpp" />
     <ClCompile Include="FontText.cpp" />
     <ClCompile Include="Image.cpp" />
@@ -175,6 +176,7 @@
     <ClInclude Include="ClearScene.h" />
     <ClInclude Include="DirectX2D.h" />
     <ClInclude Include="DirectX3D.h" />
+    <ClInclude Include="Enemy.h" />
     <ClInclude Include="FBX.h" />
     <ClInclude Include="FontText.h" />
     <ClInclude Include="framework.h" />

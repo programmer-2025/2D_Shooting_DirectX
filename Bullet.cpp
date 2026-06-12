@@ -1,14 +1,24 @@
 #include "Bullet.h"
 #include "Image.h"
 #include "Input.h"
+#include "Enemy.h"
+#include "ObjectManager.h"
+#include "Player.h"
 
 namespace {
 	Image* texture = nullptr;
 	const float SPEED = 0.1;
 }
 
-Bullet::Bullet()
+Bullet::Bullet(BaseObject* parent)
 	: BaseObject("Bullet", true) {
+	this->parentBullet = parent;
+}
+
+Bullet::~Bullet() {
+	if (texture != nullptr) {
+		texture->KillMe();
+	}
 }
 
 void Bullet::Init() {
@@ -21,6 +31,15 @@ void Bullet::Init() {
 void Bullet::Update() {
 	if (texture == nullptr) return;
 	postion_.y += SPEED;
+
+	Enemy* enemy = ObjectManager::GetDrawObject<Enemy>();
+	if (enemy->IsHit(this)) {
+		KillMe();
+		Player* player = dynamic_cast<Player*>(parentBullet);
+		if (player != nullptr) {
+			player->SetPoint(player->GetPoint() + 1.0f);
+		}
+	}
 
 	texture->SetPosition(postion_);
 }

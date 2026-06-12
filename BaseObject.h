@@ -23,7 +23,7 @@ public:
 
     std::string GetName() { return name_; };
     bool IsAlive() { return isAlive_; };
-    void KillMe() { this->isAlive_ = true; }
+    void KillMe() { this->isAlive_ = false; }
     bool IsShowing() { return isShowing_; }
     void SetShowing(const bool flag) { this->isShowing_ = flag; }
 

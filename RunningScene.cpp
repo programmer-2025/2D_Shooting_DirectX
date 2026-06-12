@@ -2,6 +2,7 @@
 #include "Player.h"
 #include "FontText.h"
 #include "ObjectManager.h"
+#include "Enemy.h"
 
 namespace {
 	FontText* leftPointText = nullptr;
@@ -17,6 +18,7 @@ RunningScene::~RunningScene()
 
 void RunningScene::Init() {
 	new Player();
+	new Enemy();
 
 	leftPointText = new FontText(L"現在の得点", DirectX::XMFLOAT3(-350, -220, 0));
 }

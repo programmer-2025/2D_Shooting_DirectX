@@ -1,14 +1,15 @@
 #pragma once
 #include "BaseObject.h"
 
-class Bullet : public BaseObject {
+class Enemy : public BaseObject {
 private:
-	BaseObject* parentBullet;
 public:
-	Bullet(BaseObject* parent);
-	~Bullet();
+	Enemy();
+	~Enemy();
 	void Init() override;
 	void Update() override;
 	void Draw() override;
 	void Release() override;
+
+	bool IsHit(BaseObject* obj);
 };

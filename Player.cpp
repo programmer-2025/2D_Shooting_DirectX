@@ -3,6 +3,9 @@
 #include "Input.h"
 #include "Bullet.h"
 #include "ImGUI/imgui.h"
+#include "ObjectManager.h"
+#include "Enemy.h"
+using namespace DirectX;
 
 namespace {
 	Image* texture = nullptr;
@@ -17,48 +20,59 @@ Player::Player()
 void Player::Init() {
 	texture = new Image("player.png", -0.5f, -0.5f);
 	texture->Init();
+	postion_ = texture->GetPosition();
+	rotation_ = texture->GetRotation();
 }
 
 void Player::Update() {
 	if (texture == nullptr) return;
-	auto postion = texture->GetPosition();
-	auto rotation = texture->GetRotation();
 
 	if (Input::IsPushKey(DIK_A)) {
-		postion.x -= SPEED;
+		postion_.x -= SPEED;
 	}
 	if (Input::IsPushKey(DIK_D)) {
-		postion.x += SPEED;
+		postion_.x += SPEED;
 	}
 	if (Input::IsPushKey(DIK_W)) {
-		postion.y += SPEED;
+		postion_.y += SPEED;
 	}
 	if (Input::IsPushKey(DIK_S)) {
-		postion.y -= SPEED;
+		postion_.y -= SPEED;
 	}
 
 	if (Input::IsPushKey(DIK_LEFT)) {
-		rotation.z += SPEED;
+		rotation_.z += SPEED;
 	}
 	if (Input::IsPushKey(DIK_RIGHT)) {
-		rotation.z -= SPEED;
+		rotation_.z -= SPEED;
 	}
 
 	static bool beforeKey = false;
 	if (Input::IsPushKey(DIK_SPACE) && !beforeKey) {
-		Bullet* bullet = new Bullet();
+		Bullet* bullet = new Bullet(this);
 		bullet->Init();
-		bullet->SetPosition(postion);
+		bullet->SetPosition(postion_);
 	}
 	beforeKey = Input::IsPushKey(DIK_SPACE);
 	
 
-	texture->SetPosition(postion);
-	texture->SetRotation(rotation);
+	texture->SetPosition(postion_);
+	texture->SetRotation(rotation_);
 }
 
 void Player::Draw(){
+	ImGui::Begin("Player");
+	Enemy* enemy = ObjectManager::GetDrawObject<Enemy>();
+	auto objLoc = enemy->GetPosition();
+	XMVECTOR bVec = XMVectorSet(objLoc.x, objLoc.y, objLoc.z, 1.0f);
+	auto obj1Loc = postion_;
+	XMVECTOR aVec = XMVectorSet(obj1Loc.x, obj1Loc.y, obj1Loc.z, 1.0f);
 
+	XMVECTOR length = XMVectorSubtract(bVec, aVec);
+	float distance = XMVectorGetX(XMVector3Length(length));
+
+	ImGui::Text("distance: %2.2f", distance);
+	ImGui::End();
 }
 
 void Player::Release()
