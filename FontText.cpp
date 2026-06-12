@@ -4,6 +4,13 @@
 FontText::FontText(std::wstring text)
 	: BaseObject("FontText", true) {
 	this->text_ = text;
+	this -> postion_ = { 0, 0, 0 };
+}
+
+FontText::FontText(std::wstring text, DirectX::XMFLOAT3 pos)
+	: BaseObject("FontText", true) {
+	this->text_ = text;
+	this->postion_ = pos;
 }
 
 FontText::~FontText()
@@ -28,7 +35,7 @@ void FontText::Draw()
 		text_.c_str(),
 		text_.size(),
 		DirectX2D::textFormat,
-		D2D1::RectF(0, 0, size.width, size.height),
+		D2D1::RectF(postion_.x, postion_.y, size.width, size.height),
 		DirectX2D::brush
 	);
 

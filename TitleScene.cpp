@@ -5,7 +5,7 @@
 
 TitleScene::TitleScene()
 	: SceneBase("TitleScene") {
-	new FontText(L"aa");
+	new FontText(L"Please Space Key!");
 }
 
 TitleScene::~TitleScene() {
