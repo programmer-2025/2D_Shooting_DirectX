@@ -1,11 +1,11 @@
-#include "TitleScene.h"
+﻿#include "TitleScene.h"
 #include "Input.h"
 #include "SceneManager.h"
 #include "FontText.h"
 
 TitleScene::TitleScene()
 	: SceneBase("TitleScene") {
-	new FontText(L"Please Space Key!");
+	new FontText(L"キーを押してください！");
 }
 
 TitleScene::~TitleScene() {
