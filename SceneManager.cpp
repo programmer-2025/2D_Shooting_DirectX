@@ -35,6 +35,7 @@ namespace SceneManager {
 		for (auto& scene : sceneList) {
 			if (scene->GetName() == name) {
 				currentScene = scene;
+				ObjectManager::ClearObject();
 				currentScene->Init();
 				ObjectManager::InitManager();
 				break;

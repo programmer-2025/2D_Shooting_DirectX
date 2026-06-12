@@ -5,7 +5,6 @@
 
 TitleScene::TitleScene()
 	: SceneBase("TitleScene") {
-	new FontText(L"キーを押してください！");
 }
 
 TitleScene::~TitleScene() {
@@ -21,6 +20,7 @@ void TitleScene::Draw() {
 }
 
 void TitleScene::Init() {
+	new FontText(L"キーを押してください！");
 }
 
 void TitleScene::Release()
