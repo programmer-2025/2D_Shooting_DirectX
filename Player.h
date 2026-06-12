@@ -3,6 +3,7 @@
 
 class Player : public BaseObject {
 private:
+	int point_;
 public:
 	Player();
 	~Player() {};
@@ -10,4 +11,7 @@ public:
 	void Update() override;
 	void Draw() override;
 	void Release() override;
+
+	int GetPoint() { return point_; }
+	void SetPoint(int point) { this->point_ = point; }
 };

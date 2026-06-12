@@ -11,6 +11,7 @@ namespace {
 
 Player::Player()
 	: BaseObject("Player", true) {
+	this->point_ = 0;
 }
 
 void Player::Init() {
