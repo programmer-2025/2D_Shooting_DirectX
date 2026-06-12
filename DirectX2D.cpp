@@ -30,11 +30,14 @@ namespace DirectX2D {
 		hr = DirectX3D::swapChain_->GetBuffer(0, IID_PPV_ARGS(&surface));
 		D2D1_RENDER_TARGET_PROPERTIES props = D2D1::RenderTargetProperties(
 			D2D1_RENDER_TARGET_TYPE_DEFAULT,
-			D2D1::PixelFormat(DXGI_FORMAT_R8G8B8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED)
+			D2D1::PixelFormat(
+				DXGI_FORMAT_UNKNOWN,
+				D2D1_ALPHA_MODE_IGNORE
+			)
 		);
 
 		hr = factory->CreateDxgiSurfaceRenderTarget(surface, &props, &renderTarget); //TODO: E_INVALIDARGになるので修正
-		renderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::White), &brush);
+		renderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Black), &brush);
 		surface->Release();
 	}
 }

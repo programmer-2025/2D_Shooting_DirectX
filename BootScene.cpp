@@ -10,6 +10,7 @@
 #include "Camera.h"
 #include "FontText.h"
 #include "SceneManager.h"
+#include "DirectX2D.h"
 
 using namespace DirectX3D;
 using namespace DirectX;
@@ -17,6 +18,7 @@ using namespace DirectX;
 BootScene::BootScene()
     : SceneBase("BootScene") {
     assert(DirectX3D::swapChain_);
+    DirectX2D::Init();
 }
 
 BootScene::~BootScene() {

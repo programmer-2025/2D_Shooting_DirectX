@@ -1,9 +1,11 @@
 #include "TitleScene.h"
 #include "Input.h"
 #include "SceneManager.h"
+#include "FontText.h"
 
 TitleScene::TitleScene()
 	: SceneBase("TitleScene") {
+	new FontText(L"aa");
 }
 
 TitleScene::~TitleScene() {
