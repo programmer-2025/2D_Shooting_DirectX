@@ -50,7 +50,7 @@ void BootScene::Draw() {
 
 void BootScene::Init() {
     counter_ = 0;
-	CameraManager::addCamera("rootCamera", new Camera("rootCamera"));
+	CameraManager::addCamera("rootCamera");
     CameraManager::setCurentCamera("rootCamera");
 }
 
