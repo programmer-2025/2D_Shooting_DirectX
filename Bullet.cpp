@@ -8,7 +8,6 @@
 #include "ImGUI/imgui.h"
 
 namespace {
-	Image* texture = nullptr;
 	const float SPEED = 1.0;
 }
 
@@ -19,21 +18,21 @@ Bullet::Bullet(BaseObject* parent)
 }
 
 Bullet::~Bullet() {
-	if (texture != nullptr) {
-		texture->KillMe();
+	if (image != nullptr) {
+		image->KillMe();
 	}
 }
 
 void Bullet::Init() {
-	texture = new Image("Bullet.png", 64, 64);
-	texture->Init();
-	postion_ = texture->GetPosition();
-	rotation_ = texture->GetRotation();
-	scale_ = texture->GetScale();
+	image = new Image("Bullet.png", 64, 64);
+	image->Init();
+	postion_ = image->GetPosition();
+	rotation_ = image->GetRotation();
+	scale_ = image->GetScale();
 }
 
 void Bullet::Update() {
-	if (texture == nullptr) return;
+	if (image == nullptr) return;
 	postion_.y += velocity_.y;
 
 	if (-64 <= postion_.x && postion_.x <= Screen::WIDTH &&
@@ -53,9 +52,9 @@ void Bullet::Update() {
 		}
 	}
 
-	texture->SetPosition(postion_);
-	texture->SetRotation(rotation_);
-	texture->SetScale(scale_);
+	image->SetPosition(postion_);
+	image->SetRotation(rotation_);
+	image->SetScale(scale_);
 }
 
 void Bullet::Draw() {

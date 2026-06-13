@@ -1,9 +1,11 @@
 #pragma once
 #include "BaseObject.h"
+#include "Image.h"
 
 class Bullet : public BaseObject {
 private:
-	BaseObject* parentBullet;
+	BaseObject* parentBullet = nullptr;
+	Image* image = nullptr;
 public:
 	Bullet(BaseObject* parent);
 	~Bullet();
