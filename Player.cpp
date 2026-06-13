@@ -22,6 +22,7 @@ void Player::Init() {
 	texture->Init();
 	postion_ = texture->GetPosition();
 	rotation_ = texture->GetRotation();
+	scale_ = texture->GetScale();
 }
 
 void Player::Update() {
@@ -58,10 +59,10 @@ void Player::Update() {
 
 	texture->SetPosition(postion_);
 	texture->SetRotation(rotation_);
+	texture->SetScale(scale_);
 }
 
 void Player::Draw(){
-	ImGui::Begin("Player");
 	Enemy* enemy = ObjectManager::GetDrawObject<Enemy>();
 	auto objLoc = enemy->GetPosition();
 	XMVECTOR bVec = XMVectorSet(objLoc.x, objLoc.y, objLoc.z, 1.0f);
@@ -71,8 +72,19 @@ void Player::Draw(){
 	XMVECTOR length = XMVectorSubtract(bVec, aVec);
 	float distance = XMVectorGetX(XMVector3Length(length));
 
-	ImGui::Text("distance: %2.2f", distance);
+#ifdef _DEBUG
+	ImGui::Begin("Player");
+	ImGui::SliderFloat("X", &postion_.x, -1.0f, 1280.0f);
+	ImGui::SliderFloat("Y", &postion_.y, -1.0f, 720.0f);
+	ImGui::SliderFloat("Z", &postion_.z, -1.0f, 10.0f);
+	ImGui::SliderFloat("angleX", &rotation_.x, -1.0f, 1.0f);
+	ImGui::SliderFloat("angleY", &rotation_.y, -1.0f, 1.0f);
+	ImGui::SliderFloat("angleZ", &rotation_.z, -1.0f, 1.0f);
+	ImGui::SliderFloat("scaleX", &scale_.x, 0.5f, 10.0f);
+	ImGui::SliderFloat("scaleY", &scale_.y, 0.5f, 10.0f);
+	ImGui::SliderFloat("scaleZ", &scale_.z, 0.5f, 10.0f);
 	ImGui::End();
+#endif
 }
 
 void Player::Release()

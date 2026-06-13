@@ -17,7 +17,6 @@ using namespace DirectX;
 
 BootScene::BootScene()
     : SceneBase("BootScene") {
-    assert(DirectX3D::swapChain_);
     DirectX2D::Init();
 }
 

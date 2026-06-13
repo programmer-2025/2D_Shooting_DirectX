@@ -45,7 +45,7 @@ void Box2D::Init() {
 	D3D11_SUBRESOURCE_DATA initData = {};
 	initData.pSysMem = vertices;
 
-	result = d3d11Device_->CreateBuffer(&bd, &initData, &vertexBuffer);
+	result = GetDXDevice()->CreateBuffer(&bd, &initData, &vertexBuffer);
 }
 
 void Box2D::Update(){
@@ -54,14 +54,15 @@ void Box2D::Update(){
 void Box2D::Draw() {
 	UINT stride = sizeof(Vertex);
 	UINT offset = 0;
+	ID3D11DeviceContext* context = GetDXContext();
 
-	DirectX3D::d3d11Context_->IASetInputLayout(inputLayout);
-	DirectX3D::d3d11Context_->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
-	DirectX3D::d3d11Context_->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	DirectX3D::d3d11Context_->VSSetShader(vertexShader, nullptr, 0);
-	DirectX3D::d3d11Context_->PSSetShader(pixelShader, nullptr, 0);
+	context->IASetInputLayout(GetShaderInputType());
+	context->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
+	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	context->VSSetShader(GetVertexShader(VertexShaderType::TEST_VERTEX_SHADER), nullptr, 0);
+	context->PSSetShader(GetPixelShader(PixelShaderType::TEST_PIXEL_SHADER), nullptr, 0);
 
-	DirectX3D::d3d11Context_->Draw(6, 0);
+	context->Draw(6, 0);
 }
 
 void Box2D::Release()

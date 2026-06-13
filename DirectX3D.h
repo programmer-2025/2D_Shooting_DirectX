@@ -11,19 +11,27 @@ struct Vertex {
 	float u, v;
 };
 
-namespace DirectX3D {
-	inline ID3D11Device* d3d11Device_ = nullptr;
-	inline ID3D11DeviceContext* d3d11Context_ = nullptr;
-	inline IDXGISwapChain* swapChain_ = nullptr;
-	inline ID3D11RenderTargetView* renderTargetView_ = nullptr;
-	inline ID3D11Texture2D* texture2D_ = nullptr;
+enum VertexShaderType {
+	TEST_VERTEX_SHADER
+};
 
-	//シェーダー
-	inline ID3D11VertexShader* vertexShader = nullptr;
-	inline ID3D11PixelShader* pixelShader = nullptr;
-	inline ID3D11InputLayout* inputLayout = nullptr;
-	
+enum PixelShaderType {
+	TEST_PIXEL_SHADER
+};
+
+namespace DirectX3D {
 	void initShader();
 	int initializeDevice(HWND hwnd);
 	void release();
+
+	ID3D11Device* GetDXDevice();
+	ID3D11DeviceContext* GetDXContext();
+	IDXGISwapChain* GetSwapChain();
+	ID3D11RenderTargetView* GetRenderTargetView();
+	ID3D11Texture2D* GetTexture2D();
+	ID3D11InputLayout* GetShaderInputType();
+
+	ID3D11VertexShader* GetVertexShader(const VertexShaderType type);
+	ID3D11PixelShader* GetPixelShader(const PixelShaderType type);
+	
 }

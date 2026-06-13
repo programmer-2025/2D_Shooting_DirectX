@@ -5,6 +5,7 @@
 #include "ObjectManager.h"
 #include "Player.h"
 #include "framework.h"
+#include "ImGUI/imgui.h"
 
 namespace {
 	Image* texture = nullptr;
@@ -28,6 +29,7 @@ void Bullet::Init() {
 	texture->Init();
 	postion_ = texture->GetPosition();
 	rotation_ = texture->GetRotation();
+	scale_ = texture->GetScale();
 }
 
 void Bullet::Update() {
@@ -52,10 +54,24 @@ void Bullet::Update() {
 	}
 
 	texture->SetPosition(postion_);
+	texture->SetRotation(rotation_);
+	texture->SetScale(scale_);
 }
 
 void Bullet::Draw() {
-
+#ifdef _DEBUG
+	ImGui::Begin("Bullet");
+	ImGui::SliderFloat("X", &postion_.x, -1.0f, 1280.0f);
+	ImGui::SliderFloat("Y", &postion_.y, -1.0f, 720.0f);
+	ImGui::SliderFloat("Z", &postion_.z, -1.0f, 10.0f);
+	ImGui::SliderFloat("angleX", &rotation_.x, -1.0f, 1.0f);
+	ImGui::SliderFloat("angleY", &rotation_.y, -1.0f, 1.0f);
+	ImGui::SliderFloat("angleZ", &rotation_.z, -1.0f, 1.0f);
+	ImGui::SliderFloat("scaleX", &scale_.x, 0.5f, 10.0f);
+	ImGui::SliderFloat("scaleY", &scale_.y, 0.5f, 10.0f);
+	ImGui::SliderFloat("scaleZ", &scale_.z, 0.5f, 10.0f);
+	ImGui::End();
+#endif
 }
 
 void Bullet::Release()

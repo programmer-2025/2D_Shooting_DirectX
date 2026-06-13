@@ -1,5 +1,6 @@
 #include "Enemy.h"
 #include "Image.h"
+#include "ImGUI/imgui.h"
 using namespace DirectX;
 
 namespace {
@@ -18,14 +19,31 @@ void Enemy::Init() {
 	image = new Image("Enemy.png", 64, 64);
 	image->Init();
 	postion_ = image->GetPosition();
+	rotation_ = image->GetRotation();
+	scale_ = image->GetScale();
 }
 
 void Enemy::Update() {
 	postion_.y = 2.0f;
 	image->SetPosition(postion_);
+	image->SetRotation(rotation_);
+	image->SetScale(scale_);
 }
 
 void Enemy::Draw() {
+#ifdef _DEBUG
+	ImGui::Begin("Enemy");
+	ImGui::SliderFloat("X", &postion_.x, -1.0f, 1280.0f);
+	ImGui::SliderFloat("Y", &postion_.y, -1.0f, 720.0f);
+	ImGui::SliderFloat("Z", &postion_.z, -1.0f, 10.0f);
+	ImGui::SliderFloat("angleX", &rotation_.x, -1.0f, 1.0f);
+	ImGui::SliderFloat("angleY", &rotation_.y, -1.0f, 1.0f);
+	ImGui::SliderFloat("angleZ", &rotation_.z, -1.0f, 1.0f);
+	ImGui::SliderFloat("scaleX", &scale_.x, 0.5f, 10.0f);
+	ImGui::SliderFloat("scaleY", &scale_.y, 0.5f, 10.0f);
+	ImGui::SliderFloat("scaleZ", &scale_.z, 0.5f, 10.0f);
+	ImGui::End();
+#endif
 }
 
 void Enemy::Release() {

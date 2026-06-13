@@ -6,12 +6,14 @@
 
 namespace DirectX2D {
 
+	using namespace DirectX3D;
+
 	void Init() {
 		HRESULT hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &factory);
 		hr = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(writeFactory), reinterpret_cast<IUnknown**>(&writeFactory));
 
 		IDXGISurface* surface = nullptr;
-		hr = DirectX3D::swapChain_->GetBuffer(0, IID_PPV_ARGS(&surface));
+		hr = GetSwapChain()->GetBuffer(0, IID_PPV_ARGS(&surface));
 		D2D1_RENDER_TARGET_PROPERTIES props = D2D1::RenderTargetProperties(
 			D2D1_RENDER_TARGET_TYPE_DEFAULT,
 			D2D1::PixelFormat(

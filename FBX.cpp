@@ -7,6 +7,7 @@
 #include "ImGUI/imgui.h"
 #include "Camera.h"
 #include "framework.h"
+using namespace DirectX3D;
 
 using namespace fbxsdk;
 using namespace DirectX;
@@ -83,7 +84,7 @@ void FBX::InitVertex(FbxMesh* mesh) {
 	D3D11_SUBRESOURCE_DATA data = {};
 	data.pSysMem = vertices_;
 
-	HRESULT hr = DirectX3D::d3d11Device_->CreateBuffer(&bd, &data, &pVertexBuffer_);
+	HRESULT hr = GetDXDevice()->CreateBuffer(&bd, &data, &pVertexBuffer_);
 }
 
 void FBX::InitIndex(FbxMesh* mesh) {
@@ -114,7 +115,7 @@ void FBX::InitIndex(FbxMesh* mesh) {
 		D3D11_SUBRESOURCE_DATA data = {};
 		data.pSysMem = index_;
 
-		HRESULT hr = DirectX3D::d3d11Device_->CreateBuffer(&bd, &data, &pIndexBuffer_[i]);
+		HRESULT hr = GetDXDevice()->CreateBuffer(&bd, &data, &pIndexBuffer_[i]);
 	}
 }
 
@@ -123,7 +124,7 @@ void FBX::InitConstantBuffer() {
 	constantBufferDesc.ByteWidth = sizeof(ConstantBuffer);
 	constantBufferDesc.Usage = D3D11_USAGE_DEFAULT;
 	constantBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	HRESULT hr = DirectX3D::d3d11Device_->CreateBuffer(&constantBufferDesc, nullptr, &pConstantBuffer_);
+	HRESULT hr = GetDXDevice()->CreateBuffer(&constantBufferDesc, nullptr, &pConstantBuffer_);
 }
 
 void FBX::InitMaterial(fbxsdk::FbxNode* node) {
@@ -167,41 +168,41 @@ void FBX::Update() {
 	ImGui::SliderFloat("scaleZ", &scale_.z, 0.5f, 2.0f);
 	ImGui::End();
 
-	DirectX3D::d3d11Context_->UpdateSubresource(pConstantBuffer_, 0, nullptr, &cb, 0, 0);
+	GetDXContext()->UpdateSubresource(pConstantBuffer_, 0, nullptr, &cb, 0, 0);
 }
 
 void FBX::Draw() {
 	UINT stride = sizeof(Vertex);
 	UINT offset = 0;
 
-	DirectX3D::d3d11Context_->VSSetShader(DirectX3D::vertexShader, nullptr, 0);
-	DirectX3D::d3d11Context_->PSSetShader(DirectX3D::pixelShader, nullptr, 0);
-	DirectX3D::d3d11Context_->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	DirectX3D::d3d11Context_->IASetVertexBuffers(0, 1, &pVertexBuffer_, &stride, &offset);
+	GetDXContext()->VSSetShader(GetVertexShader(VertexShaderType::TEST_VERTEX_SHADER), nullptr, 0);
+	GetDXContext()->PSSetShader(GetPixelShader(PixelShaderType::TEST_PIXEL_SHADER), nullptr, 0);
+	GetDXContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	GetDXContext()->IASetVertexBuffers(0, 1, &pVertexBuffer_, &stride, &offset);
 	for (int i = 0; i < materialCount_; i++) {
 		if (!isShowTexture_) {
 			ID3D11ShaderResourceView* nullSRV[1] = { nullptr };
-			DirectX3D::d3d11Context_->PSSetShaderResources(0, 1, nullSRV);
+			GetDXContext()->PSSetShaderResources(0, 1, nullSRV);
 			continue;
 		}
 		else {
 			if (materials_[i].texture != nullptr) {
-				DirectX3D::d3d11Context_->IASetIndexBuffer(pIndexBuffer_[i], DXGI_FORMAT_R32_UINT, 0);
-				DirectX3D::d3d11Context_->PSSetShaderResources(0, 1, &materials_[i].texture->shaderResourceView_);
-				DirectX3D::d3d11Context_->PSSetSamplers(0, 1, &materials_[i].texture->samplerState_);
+				GetDXContext()->IASetIndexBuffer(pIndexBuffer_[i], DXGI_FORMAT_R32_UINT, 0);
+				GetDXContext()->PSSetShaderResources(0, 1, &materials_[i].texture->shaderResourceView_);
+				GetDXContext()->PSSetSamplers(0, 1, &materials_[i].texture->samplerState_);
 			}
 		}
 	}
-	DirectX3D::d3d11Context_->VSSetConstantBuffers(0, 1, &pConstantBuffer_);
+	GetDXContext()->VSSetConstantBuffers(0, 1, &pConstantBuffer_);
 	D3D11_RASTERIZER_DESC rasterizerDesc = {};
 	rasterizerDesc.FillMode = D3D11_FILL_SOLID;
 	rasterizerDesc.CullMode = D3D11_CULL_NONE;
 	rasterizerDesc.FrontCounterClockwise = FALSE;
 	ID3D11RasterizerState* rasterizerState = nullptr;
-	DirectX3D::d3d11Device_->CreateRasterizerState(&rasterizerDesc, &rasterizerState);
-	DirectX3D::d3d11Context_->RSSetState(rasterizerState);
-	DirectX3D::d3d11Context_->DrawIndexed(polygonCount_ * 3, 0, 0);
-	DirectX3D::d3d11Context_->RSSetState(nullptr);
+	GetDXDevice()->CreateRasterizerState(&rasterizerDesc, &rasterizerState);
+	GetDXContext()->RSSetState(rasterizerState);
+	GetDXContext()->DrawIndexed(polygonCount_ * 3, 0, 0);
+	GetDXContext()->RSSetState(nullptr);
 
 
 }

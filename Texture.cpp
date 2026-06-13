@@ -83,27 +83,28 @@ void Texture::Init() {
 	imageData.resize(imageSize);
 	result = pConverter->CopyPixels(nullptr, static_cast<UINT>(rowBytes), static_cast<UINT>(imageSize), imageData.data());
 
+	auto texure2D = GetTexture2D();
 	D3D11_SUBRESOURCE_DATA textureData = {};
 	textureData.pSysMem = imageData.data();
 	textureData.SysMemPitch = static_cast<UINT>(rowBytes);
-	DirectX3D::d3d11Device_->CreateTexture2D(
+	GetDXDevice()->CreateTexture2D(
 		&desc,
 		&textureData,
-		&DirectX3D::texture2D_
+		&texure2D
 	);
 
 	D3D11_SHADER_RESOURCE_VIEW_DESC viewDesc = {};
 	viewDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	viewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 	viewDesc.Texture2D.MipLevels = 1;
-	DirectX3D::d3d11Device_->CreateShaderResourceView(DirectX3D::texture2D_, &viewDesc, &shaderResourceView_);
+	GetDXDevice()->CreateShaderResourceView(texure2D, &viewDesc, &shaderResourceView_);
 
 	D3D11_SAMPLER_DESC samplerDesc = {};
 	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
 	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
 	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
 	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-	DirectX3D::d3d11Device_->CreateSamplerState(&samplerDesc, &samplerState_);
+	GetDXDevice()->CreateSamplerState(&samplerDesc, &samplerState_);
 
 	D3D11_BUFFER_DESC bufferDesc = {};
 	bufferDesc.Usage = D3D11_USAGE_DEFAULT;
@@ -120,9 +121,9 @@ void Texture::Init() {
 	constantBufferDesc.ByteWidth = sizeof(ConstantBuffer);
 	constantBufferDesc.Usage = D3D11_USAGE_DEFAULT;
 	constantBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	DirectX3D::d3d11Device_->CreateBuffer(&constantBufferDesc, nullptr, &constantBuffer_);
+	GetDXDevice()->CreateBuffer(&constantBufferDesc, nullptr, &constantBuffer_);
 
-	DirectX3D::d3d11Device_->CreateBuffer(&bufferDesc, &bufferData, &vertexBuffer_);
+	GetDXDevice()->CreateBuffer(&bufferDesc, &bufferData, &vertexBuffer_);
 
 }
 
@@ -136,46 +137,33 @@ void Texture::Update() {
 
 	ConstantBuffer cb = {};
 	cb.worldViewProj = XMMatrixTranspose(world * view * projection);
-
-	ImGui::Begin("Texture");
-	ImGui::SliderFloat("X", &postion_.x, -1.0f, 1.0f);
-	ImGui::SliderFloat("Y", &postion_.y, -1.0f, 1.0f);
-	ImGui::SliderFloat("Z", &postion_.z, -1.0f, 1.0f);
-	ImGui::SliderFloat("angleX", &rotation_.x, -1.0f, 1.0f);
-	ImGui::SliderFloat("angleY", &rotation_.y, -1.0f, 1.0f);
-	ImGui::SliderFloat("angleZ", &rotation_.z, -1.0f, 1.0f);
-	ImGui::SliderFloat("scaleX", &scale_.x, 0.5f, 2.0f);
-	ImGui::SliderFloat("scaleY", &scale_.y, 0.5f, 2.0f);
-	ImGui::SliderFloat("scaleZ", &scale_.z, 0.5f, 2.0f);
-	ImGui::End();
-
-	DirectX3D::d3d11Context_->UpdateSubresource(constantBuffer_, 0, nullptr, &cb, 0, 0);
+	GetDXContext()->UpdateSubresource(constantBuffer_, 0, nullptr, &cb, 0, 0);
 }
 
 void Texture::Draw() {
 	UINT stride = sizeof(Vertex);
 	UINT offset = 0;
 
-	DirectX3D::d3d11Context_->IASetInputLayout(DirectX3D::inputLayout);
-	DirectX3D::d3d11Context_->IASetVertexBuffers(0, 1, &vertexBuffer_, &stride, &offset);
-	DirectX3D::d3d11Context_->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	DirectX3D::d3d11Context_->VSSetShader(DirectX3D::vertexShader, nullptr, 0);
-	DirectX3D::d3d11Context_->PSSetShader(DirectX3D::pixelShader, nullptr, 0);
-	DirectX3D::d3d11Context_->PSSetShaderResources(0, 1, &shaderResourceView_);
-	DirectX3D::d3d11Context_->PSSetSamplers(0, 1, &samplerState_);
-	DirectX3D::d3d11Context_->VSSetConstantBuffers(0, 1, &constantBuffer_);
+	GetDXContext()->IASetInputLayout(GetShaderInputType());
+	GetDXContext()->IASetVertexBuffers(0, 1, &vertexBuffer_, &stride, &offset);
+	GetDXContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	GetDXContext()->VSSetShader(GetVertexShader(VertexShaderType::TEST_VERTEX_SHADER), nullptr, 0);
+	GetDXContext()->PSSetShader(GetPixelShader(PixelShaderType::TEST_PIXEL_SHADER), nullptr, 0);
+	GetDXContext()->PSSetShaderResources(0, 1, &shaderResourceView_);
+	GetDXContext()->PSSetSamplers(0, 1, &samplerState_);
+	GetDXContext()->VSSetConstantBuffers(0, 1, &constantBuffer_);
 
 	D3D11_RASTERIZER_DESC rasterizerDesc = {};
 	rasterizerDesc.FillMode = D3D11_FILL_SOLID;
 	rasterizerDesc.CullMode = D3D11_CULL_NONE;
 	rasterizerDesc.FrontCounterClockwise = FALSE;
 	ID3D11RasterizerState* rasterizerState = nullptr;
-	DirectX3D::d3d11Device_->CreateRasterizerState(&rasterizerDesc, &rasterizerState);
-	DirectX3D::d3d11Context_->RSSetState(rasterizerState);
+	GetDXDevice()->CreateRasterizerState(&rasterizerDesc, &rasterizerState);
+	GetDXContext()->RSSetState(rasterizerState);
 
-	//DirectX3D::d3d11Context_->Draw(6, 0);
+	//GetDXContext()->Draw(6, 0);
 
-	DirectX3D::d3d11Context_->RSSetState(nullptr);
+	GetDXContext()->RSSetState(nullptr);
 }
 
 void Texture::Release() {

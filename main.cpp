@@ -49,8 +49,8 @@ int initializeImGUI(HWND hwnd) {
 
 	ImGui::StyleColorsDark();
 	ImGui_ImplWin32_Init(hwnd);
-	ID3D11Device* device = (ID3D11Device*)DirectX3D::d3d11Device_;
-	ID3D11DeviceContext* deviceContext = (ID3D11DeviceContext*)DirectX3D::d3d11Context_;
+	ID3D11Device* device = (ID3D11Device*)GetDXDevice();
+	ID3D11DeviceContext* deviceContext = (ID3D11DeviceContext*)GetDXContext();
 	ImGui_ImplDX11_Init(device, deviceContext);
 
 	return 0;
@@ -58,8 +58,9 @@ int initializeImGUI(HWND hwnd) {
 
 void Draw() {
 	float color[4] = { 1, 1, 1, 1.0f };
-	DirectX3D::d3d11Context_->OMSetRenderTargets(1, &renderTargetView_, nullptr);
-	DirectX3D::d3d11Context_->ClearRenderTargetView(renderTargetView_, color);
+	auto renderTargetView = GetRenderTargetView();
+	GetDXContext()->OMSetRenderTargets(1, &renderTargetView, nullptr);
+	GetDXContext()->ClearRenderTargetView(renderTargetView, color);
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
@@ -81,7 +82,7 @@ void Draw() {
 		ImGui::RenderPlatformWindowsDefault();
 	}
 
-	DirectX3D::swapChain_->Present(1, 0);
+	GetSwapChain()->Present(1, 0);
 }
 
 void Update() {

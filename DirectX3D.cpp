@@ -3,6 +3,19 @@
 #include <assert.h>
 #include <d3dcompiler.h>
 
+namespace DirectX3D {
+	inline ID3D11Device* d3d11Device_ = nullptr;
+	inline ID3D11DeviceContext* d3d11Context_ = nullptr;
+	inline IDXGISwapChain* swapChain_ = nullptr;
+	inline ID3D11RenderTargetView* renderTargetView_ = nullptr;
+	inline ID3D11Texture2D* texture2D_ = nullptr;
+
+	//シェーダー
+	inline ID3D11VertexShader* vertexShader = nullptr;
+	inline ID3D11PixelShader* pixelShader = nullptr;
+	inline ID3D11InputLayout* inputLayout = nullptr;
+}
+
 int DirectX3D::initializeDevice(HWND hwnd) {
     DXGI_SWAP_CHAIN_DESC desc = {};
     desc.BufferDesc.Width = Screen::WIDTH;
@@ -126,4 +139,48 @@ void DirectX3D::release() {
     swapChain_->Release();
     renderTargetView_->Release();
     texture2D_->Release();
+}
+
+ID3D11Device* DirectX3D::GetDXDevice() {
+	return d3d11Device_;
+}
+
+ID3D11DeviceContext* DirectX3D::GetDXContext() {
+	return d3d11Context_;
+}
+
+IDXGISwapChain* DirectX3D::GetSwapChain() {
+	return swapChain_;
+}
+
+ID3D11RenderTargetView* DirectX3D::GetRenderTargetView() {
+	return renderTargetView_;
+}
+
+ID3D11Texture2D* DirectX3D::GetTexture2D() {
+	return texture2D_;
+}
+
+ID3D11InputLayout* DirectX3D::GetShaderInputType() {
+	return inputLayout;
+}
+
+ID3D11VertexShader* DirectX3D::GetVertexShader(const VertexShaderType type) {
+	switch (type) {
+	case TEST_VERTEX_SHADER: 
+		return vertexShader;
+	default:
+		return vertexShader;
+	}
+	return nullptr;
+}
+
+ID3D11PixelShader* DirectX3D::GetPixelShader(const PixelShaderType type) {
+	switch (type) {
+	case TEST_PIXEL_SHADER:
+		return pixelShader;
+	default:
+		return pixelShader;
+	}
+	return nullptr;
 }
