@@ -28,6 +28,7 @@ void Image::Init() {
 	IWICBitmapDecoder* pDecoder = nullptr;
 	IWICBitmapFrameDecode* pFrame = nullptr;
 	IWICFormatConverter* pConverter = nullptr;
+	ID3D11BlendState* blendState = nullptr;
 	std::wstring wPath(path_.begin(), path_.end());
 
 	result = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
@@ -56,6 +57,19 @@ void Image::Init() {
 		WICBitmapPaletteTypeMedianCut
 	);
 	pConverter->GetSize(&width_, &height_);
+
+	D3D11_BLEND_DESC blendDesc = {};
+	blendDesc.RenderTarget[0].BlendEnable = TRUE;
+	blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+	blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+	blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+	blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+	blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_INV_SRC_ALPHA;
+	blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+
+	DirectX3D::d3d11Device_->CreateBlendState(&blendDesc, &blendState);
+
 
 	D3D11_TEXTURE2D_DESC desc = {};
 	desc.Width = width_;
@@ -116,6 +130,14 @@ void Image::Init() {
 	DirectX3D::d3d11Device_->CreateBuffer(&constantBufferDesc, nullptr, &constantBuffer_);
 
 	DirectX3D::d3d11Device_->CreateBuffer(&bufferDesc, &bufferData, &vertexBuffer_);
+
+	float blendFactor[4] = { 0, 0, 0, 0 };
+
+	DirectX3D::d3d11Context_->OMSetBlendState(
+		blendState,
+		blendFactor,
+		0xFFFFFFFF
+	);
 
 }
 
