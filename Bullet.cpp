@@ -4,6 +4,7 @@
 #include "Enemy.h"
 #include "ObjectManager.h"
 #include "Player.h"
+#include "framework.h"
 
 namespace {
 	Image* texture = nullptr;
@@ -32,6 +33,14 @@ void Bullet::Init() {
 void Bullet::Update() {
 	if (texture == nullptr) return;
 	postion_.y += velocity_.y;
+
+	if (-64 <= postion_.x && postion_.x <= Screen::WIDTH &&
+			-64 <= postion_.y && postion_.y <= Screen::HEIGHT) {
+
+	}
+	else {
+		KillMe();
+	}
 
 	Enemy* enemy = ObjectManager::GetDrawObject<Enemy>();
 	if (enemy->IsHit(this)) {
