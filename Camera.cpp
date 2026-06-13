@@ -6,17 +6,17 @@ namespace CameraManager{
 	inline std::map<std::string, Camera*> cameraMap;
 	inline Camera* currentCamera_ = nullptr;
 
-	void addCamera(std::string name, Camera* camera) {
-		cameraMap[name] = camera;
+	void addCamera(const std::string& name) {
+		cameraMap[name] = new Camera(name);
 	}
 
-	void setCurentCamera(std::string name) {
+	void setCurentCamera(const std::string& name) {
 		if (cameraMap.find(name) != cameraMap.end()) { 
 			currentCamera_ = cameraMap[name];
 		}
 	}
 
-	Camera* getCamera(std::string name) {
+	Camera* getCamera(const std::string& name) {
 		return cameraMap[name];
 	}
 

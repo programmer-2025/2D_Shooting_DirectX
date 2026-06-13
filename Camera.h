@@ -26,6 +26,9 @@ public:
 
 	inline std::string getName() { return name_; }
 
+	/// <summary>
+	/// 場所+注視点+カメラの上方向を組み合わせた、行列を返す関数。
+	/// </summary>
 	inline DirectX::XMMATRIX getMatrix() {
 		return DirectX::XMMatrixLookAtLH(
 			DirectX::XMVectorSet(cameraPostion_.x, cameraPostion_.y, cameraPostion_.z, 1.0f),
@@ -34,27 +37,63 @@ public:
 		);
 	}
 
+	/// <summary>
+	/// カメラの場所を取得する関数
+	/// </summary>
 	inline DirectX::XMFLOAT3 getCameraPostion() {
 		return cameraPostion_;
 	}
 
+	/// <summary>
+	/// カメラの場所を変更する関数
+	/// </summary>
 	inline void setCameraPostion(DirectX::XMFLOAT3 cameraPos) {
 		this->cameraPostion_ = cameraPos;
 	}
 
+	/// <summary>
+	/// カメラの注視点（※見る場所）を取得する関数
+	/// </summary>
 	inline DirectX::XMFLOAT3 getFoucsPostion() {
 		return foucusPostion_;
 	}
 
+	/// <summary>
+	/// カメラの注視点（※見る場所）を変更する関数
+	/// </summary>
 	inline void setFoucsPostion(DirectX::XMFLOAT3 foucsPos) {
 		this->foucusPostion_ = foucsPos;
 	}
 };
 
+/// <summary>
+/// カメラを管理する名前空間
+/// </summary>
 namespace CameraManager {
-	void addCamera(std::string name, Camera* camera);
-	void setCurentCamera(std::string name);
-	Camera* getCamera(std::string name);
+
+	/// <summary>
+	/// 新しいカメラを追加する関数
+	/// </summary>
+	/// <param name="name">追加したいカメラの名前</param>
+	void addCamera(const std::string& name);
+
+	/// <summary>
+	/// 現在のカメラを変更する関数
+	/// </summary>
+	/// <param name="name">変更したいカメラの名前</param>
+	void setCurentCamera(const std::string& name);
+
+	/// <summary>
+	/// カメラを取得する関数
+	/// </summary>
+	/// <param name="name">取得したいカメラの名前</param>
+	/// <returns>引数に指定したカメラ（※見つからない場合はnullptrを返します。）</returns>
+	Camera* getCamera(const std::string& name);
+
+	/// <summary>
+	/// 現在のカメラを取得する関数
+	/// </summary>
+	/// <returns>現在のカメラを返す（※見つからない場合はnullptrを返します。）</returns>
 	Camera* getCurentCamera();
 }
 
