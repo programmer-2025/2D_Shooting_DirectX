@@ -40,7 +40,7 @@ bool Enemy::IsHit(BaseObject* obj) {
 	XMVECTOR subtract = XMVectorSubtract(bVec, aVec);
 	XMVECTOR length = XMVector3Length(subtract);
 	float distance = XMVectorGetX(length);
-	if (distance < 1.0f) {
+	if (distance < 32.0f + 32.0f) {
  		return true;
 	}
 	return false;

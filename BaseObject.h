@@ -10,6 +10,7 @@ protected:
     bool isShowing_;
 
     DirectX::XMFLOAT3 postion_;
+    DirectX::XMFLOAT3 velocity_;
 	DirectX::XMFLOAT3 rotation_;
 	DirectX::XMFLOAT3 scale_;
 public:
@@ -29,6 +30,8 @@ public:
 
 	DirectX::XMFLOAT3 GetPosition() const { return postion_; }
 	void SetPosition(const DirectX::XMFLOAT3 position) { this->postion_ = position; }
+    DirectX::XMFLOAT3 GetVelocity() const { return velocity_; }
+    void SetVelocity(const DirectX::XMFLOAT3 velocity) { this->velocity_ = velocity; }
 	DirectX::XMFLOAT3 GetRotation() const { return rotation_; }
 	void SetRotation(const DirectX::XMFLOAT3 rotation) { this->rotation_ = rotation; }
 	DirectX::XMFLOAT3 GetScale() const { return scale_; }

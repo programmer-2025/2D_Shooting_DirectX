@@ -7,12 +7,13 @@
 
 namespace {
 	Image* texture = nullptr;
-	const float SPEED = 0.1;
+	const float SPEED = 1.0;
 }
 
 Bullet::Bullet(BaseObject* parent)
 	: BaseObject("Bullet", true) {
 	this->parentBullet = parent;
+	this->velocity_ = { 0, -1, 0 };
 }
 
 Bullet::~Bullet() {
@@ -30,7 +31,7 @@ void Bullet::Init() {
 
 void Bullet::Update() {
 	if (texture == nullptr) return;
-	postion_.y += SPEED;
+	postion_.y += velocity_.y;
 
 	Enemy* enemy = ObjectManager::GetDrawObject<Enemy>();
 	if (enemy->IsHit(this)) {
