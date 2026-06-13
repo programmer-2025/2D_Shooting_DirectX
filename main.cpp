@@ -131,6 +131,8 @@ int initializeWindow(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	DirectX3D::initShader();
 	SceneManager::InitManager();
 	AudioManager::InitManager();
+
+	CoInitializeEx(0, COINIT_MULTITHREADED);
 	//DirectX2D::Init();
 
 	//int id = AudioManager::Load(L"test_sound.wav", true);

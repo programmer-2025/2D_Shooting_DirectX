@@ -8,31 +8,32 @@
 
 using namespace DirectX;
 
-Image::Image(std::string path, float leftX, float leftY)
+Image::Image(const std::string& path, const float leftX, const float leftY)
 	: BaseObject("Image", true) {
 	this->path_ = path;
 
-	// スクリーン座標 → 画像の座標
-	vertices_[0] = { 0.0f, 0.0f, 0.0f, 0,1,0,1, 0, 0 }; // スクリーン座標: 左下 → 画像の座標: 左上 
-	vertices_[1] = { 0.0f, leftY, 0.0f, 1,0,0,1, 0, 1 }; // 左上 → 左下
-	vertices_[2] = { leftX, leftY, 0.0f, 1,1,0,1, 1, 1 }; // 右上 → 右下
+	// DirectXでは、2個の三角形を組み合わせて描画するイメージ
+	//  |------------|
+	//  |[0,1,2] /   |
+	//  |       /    |
+	//  |     /      |
+	//  |   / [3,4,5]|
+	//  |------------|
 
-	vertices_[3] = { 0.0f, 0.0f, 0.0f ,0,0,1, 0, 0, 0 }; // 右上 → 右下
-	vertices_[4] = { leftX, leftY, 0.0f, 1,1,0,1, 1, 1 }; // 左下 → 左上
-	vertices_[5] = { leftX, 0.0f, 0.0f, 0,0,1,1, 1, 0 }; // 右下 → 右上
+	vertices_[0] = { 0.0f, 0.0f, 0.0f, 0,1,0,1, 0, 0 }; // 左上 
+	vertices_[1] = { 0.0f, leftY, 0.0f, 1,0,0,1, 0, 1 }; // 左下
+	vertices_[2] = { leftX, 0.0f, 0.0f, 0,0,1,1, 1, 0 }; // 右上
+
+	vertices_[3] = { leftX, 0.0f, 0.0f, 0,0,1,1, 1, 0 }; // 右上
+	vertices_[4] = { leftX, leftY, 0.0f, 1,1,0,1, 1, 1 }; // 右下
+	vertices_[5] = { 0.0f, leftY, 0.0f, 1,0,0,1, 0, 1 }; // 左下
+	
 }
 
 void Image::Init() {
-	static HRESULT result = { 0 };
-	IWICImagingFactory* pFactory = nullptr;
-	IWICBitmapDecoder* pDecoder = nullptr;
-	IWICBitmapFrameDecode* pFrame = nullptr;
-	IWICFormatConverter* pConverter = nullptr;
-	ID3D11BlendState* blendState = nullptr;
+	HRESULT result = { 0 };
 	std::wstring wPath(path_.begin(), path_.end());
 
-	result = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
-	assert(SUCCEEDED(result));
 	result = CoCreateInstance(CLSID_WICImagingFactory, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pFactory));
 	assert(SUCCEEDED(result));
 	result = pFactory->CreateDecoderFromFilename(
@@ -58,9 +59,10 @@ void Image::Init() {
 	);
 	pConverter->GetSize(&width_, &height_);
 
+	//参考：https://learn.microsoft.com/ja-jp/windows/win32/api/d3d11/ns-d3d11-d3d11_render_target_blend_desc
 	D3D11_BLEND_DESC blendDesc = {};
-	blendDesc.RenderTarget[0].BlendEnable = TRUE;
-	blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+	blendDesc.RenderTarget[0].BlendEnable = TRUE; //ブレンドを有効にする
+	blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA; 
 	blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
 	blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
 	blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
@@ -68,9 +70,17 @@ void Image::Init() {
 	blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
 	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 
-	DirectX3D::d3d11Device_->CreateBlendState(&blendDesc, &blendState);
+	DirectX3D::d3d11Device_->CreateBlendState(&blendDesc, &blendState); //ブレンドステートを作成する
 
+	//参考： https://learn.microsoft.com/ja-jp/windows/win32/api/d3d11/ns-d3d11-d3d11_rasterizer_desc
+	D3D11_RASTERIZER_DESC rasterizerDesc = {};
+	rasterizerDesc.FillMode = D3D11_FILL_SOLID; // レンダリング時に使用する塗りつぶしモード
+	rasterizerDesc.CullMode = D3D11_CULL_NONE;
+	rasterizerDesc.FrontCounterClockwise = FALSE;
 
+	DirectX3D::d3d11Device_->CreateRasterizerState(&rasterizerDesc, &rasterizerState);
+
+	//参考： https://learn.microsoft.com/ja-jp/windows/win32/api/d3d11/ns-d3d11-d3d11_texture2d_desc
 	D3D11_TEXTURE2D_DESC desc = {};
 	desc.Width = width_;
 	desc.Height = height_;
@@ -90,6 +100,7 @@ void Image::Init() {
 	imageData.resize(imageSize);
 	result = pConverter->CopyPixels(nullptr, static_cast<UINT>(rowBytes), static_cast<UINT>(imageSize), imageData.data());
 
+	// 参考：https://learn.microsoft.com/ja-jp/windows/win32/api/d3d11/ns-d3d11-d3d11_subresource_data
 	D3D11_SUBRESOURCE_DATA textureData = {};
 	textureData.pSysMem = imageData.data();
 	textureData.SysMemPitch = static_cast<UINT>(rowBytes);
@@ -99,12 +110,14 @@ void Image::Init() {
 		&DirectX3D::texture2D_
 	);
 
+	// 参考： https://learn.microsoft.com/ja-jp/windows/win32/api/d3d11/ns-d3d11-d3d11_shader_resource_view_desc
 	D3D11_SHADER_RESOURCE_VIEW_DESC viewDesc = {};
 	viewDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	viewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 	viewDesc.Texture2D.MipLevels = 1;
 	DirectX3D::d3d11Device_->CreateShaderResourceView(DirectX3D::texture2D_, &viewDesc, &shaderResourceView_);
 
+	// 参考： https://learn.microsoft.com/ja-jp/windows/win32/api/d3d11/ns-d3d11-d3d11_sampler_desc
 	D3D11_SAMPLER_DESC samplerDesc = {};
 	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
 	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
@@ -112,6 +125,7 @@ void Image::Init() {
 	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
 	DirectX3D::d3d11Device_->CreateSamplerState(&samplerDesc, &samplerState_);
 
+	// 参考： https://learn.microsoft.com/ja-jp/windows/win32/api/d3d11/ns-d3d11-d3d11_buffer_desc
 	D3D11_BUFFER_DESC bufferDesc = {};
 	bufferDesc.Usage = D3D11_USAGE_DEFAULT;
 	bufferDesc.ByteWidth = sizeof(vertices_);
@@ -120,9 +134,11 @@ void Image::Init() {
 	bufferDesc.MiscFlags = 0;
 	bufferDesc.StructureByteStride = 0;
 
+	// 参考： https://learn.microsoft.com/ja-jp/windows/win32/api/d3d11/ns-d3d11-d3d11_subresource_data
 	D3D11_SUBRESOURCE_DATA bufferData = {};
 	bufferData.pSysMem = vertices_;
 
+	// 参考： https://learn.microsoft.com/ja-jp/windows/win32/api/d3d11/ns-d3d11-d3d11_buffer_desc
 	D3D11_BUFFER_DESC constantBufferDesc = {};
 	constantBufferDesc.ByteWidth = sizeof(ConstantBuffer);
 	constantBufferDesc.Usage = D3D11_USAGE_DEFAULT;
@@ -184,12 +200,6 @@ void Image::Draw() {
 	DirectX3D::d3d11Context_->PSSetSamplers(0, 1, &samplerState_);
 	DirectX3D::d3d11Context_->VSSetConstantBuffers(0, 1, &constantBuffer_);
 
-	D3D11_RASTERIZER_DESC rasterizerDesc = {};
-	rasterizerDesc.FillMode = D3D11_FILL_SOLID;
-	rasterizerDesc.CullMode = D3D11_CULL_NONE;
-	rasterizerDesc.FrontCounterClockwise = FALSE;
-	ID3D11RasterizerState* rasterizerState = nullptr;
-	DirectX3D::d3d11Device_->CreateRasterizerState(&rasterizerDesc, &rasterizerState);
 	DirectX3D::d3d11Context_->RSSetState(rasterizerState);
 
 	DirectX3D::d3d11Context_->Draw(6, 0);
@@ -197,6 +207,15 @@ void Image::Draw() {
 	DirectX3D::d3d11Context_->RSSetState(nullptr);
 }
 
-void Image::Release()
-{
+void Image::Release() {
+	if (samplerState_ != nullptr) samplerState_->Release();
+	if (shaderResourceView_ != nullptr) shaderResourceView_->Release();
+	if (constantBuffer_ != nullptr) constantBuffer_->Release();
+	if (vertexBuffer_ != nullptr) vertexBuffer_->Release();
+	if (pFactory != nullptr) pFactory->Release();
+	if (pDecoder != nullptr) pDecoder->Release();
+	if (pFrame != nullptr) pFrame->Release();
+	if (pConverter != nullptr) pConverter->Release();
+	if (blendState != nullptr) blendState->Release();
+	if (rasterizerState != nullptr) rasterizerState->Release();
 }

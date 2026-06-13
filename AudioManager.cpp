@@ -1,7 +1,6 @@
 #include "AudioManager.h"
 
 void AudioManager::InitManager() {
-    CoInitializeEx(0, COINIT_MULTITHREADED);
     XAudio2Create(&audio);
     audio->CreateMasteringVoice(&masteringVoice);
 }

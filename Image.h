@@ -2,11 +2,8 @@
 #include "DirectX3D.h"
 #include <string>
 #include "BaseObject.h"
-
-namespace {
-	ID3D11Buffer* vertexBuffer_;
-}
-
+#include <wincodec.h>
+#include <vector>
 
 /// <summary>
 /// 画像を表示するクラス
@@ -16,20 +13,22 @@ private:
 	UINT width_, height_;
 	std::string path_;
 
-public:
-	ID3D11SamplerState* samplerState_;
-	ID3D11ShaderResourceView* shaderResourceView_;
-	ID3D11Buffer* constantBuffer_;
+	ID3D11SamplerState* samplerState_ = nullptr;
+	ID3D11ShaderResourceView* shaderResourceView_ = nullptr;
+	ID3D11Buffer* constantBuffer_ = nullptr;
+	ID3D11Buffer* vertexBuffer_ = nullptr;
+	IWICImagingFactory* pFactory = nullptr;
+	IWICBitmapDecoder* pDecoder = nullptr;
+	IWICBitmapFrameDecode* pFrame = nullptr;
+	IWICFormatConverter* pConverter = nullptr;
+	ID3D11BlendState* blendState = nullptr;
+	ID3D11RasterizerState* rasterizerState = nullptr;
 	Vertex vertices_[6];
-	DirectX::XMMATRIX matrix_;
-
-	Image(std::string path, float leftX, float leftY);
+public:
+	Image(const std::string& path, const float leftX, const float leftY);
 	~Image() {};
 	void Init() override;
 	void Update() override;
 	void Draw() override;
 	void Release() override;
-
-	DirectX::XMMATRIX GetMatrix() const { return matrix_; }
-	void SetMatrix(DirectX::XMMATRIX matrix) { this->matrix_ = matrix; }
 };
