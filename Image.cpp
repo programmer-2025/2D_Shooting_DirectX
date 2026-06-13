@@ -11,14 +11,15 @@ using namespace DirectX;
 Image::Image(std::string path, float leftX, float leftY)
 	: BaseObject("Image", true) {
 	this->path_ = path;
-	// スクリーン座標 → 画像の座標
-	vertices_[0] = { leftX, leftY + 1.0f, 0.0f, 0,1,0,1, 0, 0 }; // スクリーン座標: 左下 → 画像の座標: 左上 
-	vertices_[1] = { leftX, leftY, 0.0f, 1,0,0,1, 0, 1 }; // 左上 → 左下
-	vertices_[2] = { leftX + 1.0f, leftY, 0.0f, 1,1,0,1, 1, 1 }; // 右上 → 右下
 
-	vertices_[3] = { leftX + 1.0f, leftY, 0.0f, 1,0,0,1, 1, 1 }; // 右上 → 右下
-	vertices_[4] = { leftX, leftY + 1.0f, 0.0f, 1,1,0,1, 0, 0 }; // 左下 → 左上
-	vertices_[5] = { leftX + 1.0f, leftY + 1.0f, 0.0f, 0,0,1,1, 1, 0 }; // 右下 → 右上
+	// スクリーン座標 → 画像の座標
+	vertices_[0] = { 0.0f, 0.0f, 0.0f, 0,1,0,1, 0, 0 }; // スクリーン座標: 左下 → 画像の座標: 左上 
+	vertices_[1] = { 0.0f, leftY, 0.0f, 1,0,0,1, 0, 1 }; // 左上 → 左下
+	vertices_[2] = { leftX, leftY, 0.0f, 1,1,0,1, 1, 1 }; // 右上 → 右下
+
+	vertices_[3] = { 0.0f, 0.0f, 0.0f ,0,0,1, 0, 0, 0 }; // 右上 → 右下
+	vertices_[4] = { leftX, leftY, 0.0f, 1,1,0,1, 1, 1 }; // 左下 → 左上
+	vertices_[5] = { leftX, 0.0f, 0.0f, 0,0,1,1, 1, 0 }; // 右下 → 右上
 }
 
 void Image::Init() {
@@ -124,7 +125,11 @@ void Image::Update() {
 	XMMATRIX transMat = XMMatrixTranslation(postion_.x, postion_.y, postion_.z);
 	XMMATRIX world = scaleMat * rotMat * transMat;
 	XMMATRIX view = CameraManager::getCurentCamera()->getMatrix();
-	XMMATRIX projection = DirectX::XMMatrixPerspectiveFovLH(XMConvertToRadians(90.0f), 1280.0f / 720.0f, 0.1f, 100.0f);
+	XMMATRIX projection = XMMatrixOrthographicOffCenterLH(
+		0.0f, 1280.0f,
+		720.0f, 0.0f,
+		0.0f, 100.0f
+	);
 
 	ConstantBuffer cb = {};
 	cb.worldViewProj = XMMatrixTranspose(world * view * projection);

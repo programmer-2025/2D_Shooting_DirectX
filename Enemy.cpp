@@ -15,7 +15,7 @@ Enemy::~Enemy() {
 
 
 void Enemy::Init() {
-	image = new Image("Enemy.png", -0.5f, -0.5f);
+	image = new Image("Enemy.png", 64, 64);
 	image->Init();
 	postion_ = image->GetPosition();
 }

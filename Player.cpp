@@ -9,7 +9,7 @@ using namespace DirectX;
 
 namespace {
 	Image* texture = nullptr;
-	const float SPEED = 0.1;
+	const float SPEED = 1.0f;
 }
 
 Player::Player()
@@ -18,7 +18,7 @@ Player::Player()
 }
 
 void Player::Init() {
-	texture = new Image("player.png", -0.5f, -0.5f);
+	texture = new Image("player.png", 64, 64);
 	texture->Init();
 	postion_ = texture->GetPosition();
 	rotation_ = texture->GetRotation();
@@ -34,10 +34,10 @@ void Player::Update() {
 		postion_.x += SPEED;
 	}
 	if (Input::IsPushKey(DIK_W)) {
-		postion_.y += SPEED;
+		postion_.y -= SPEED;
 	}
 	if (Input::IsPushKey(DIK_S)) {
-		postion_.y -= SPEED;
+		postion_.y += SPEED;
 	}
 
 	if (Input::IsPushKey(DIK_LEFT)) {

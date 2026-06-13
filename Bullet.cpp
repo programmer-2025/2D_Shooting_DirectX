@@ -22,7 +22,7 @@ Bullet::~Bullet() {
 }
 
 void Bullet::Init() {
-	texture = new Image("Bullet.png", -0.5f, -0.5f);
+	texture = new Image("Bullet.png", 64, 64);
 	texture->Init();
 	postion_ = texture->GetPosition();
 	rotation_ = texture->GetRotation();
