@@ -1,6 +1,7 @@
 #include "Enemy.h"
 #include "Image.h"
 #include "ImGUI/imgui.h"
+#include "framework.h"
 using namespace DirectX;
 
 namespace {
@@ -19,12 +20,23 @@ void Enemy::Init() {
 	image = new Image("Enemy.png", 64, 64);
 	image->Init();
 	postion_ = image->GetPosition();
+	postion_ = {Screen::WIDTH / 2, 10, 0};
 	rotation_ = image->GetRotation();
 	scale_ = image->GetScale();
+	velocity_ = { 0, 1.0f, 0 };
 }
 
 void Enemy::Update() {
-	postion_.y = 2.0f;
+	if (-64 <= postion_.x && postion_.x <= Screen::WIDTH &&
+		-64 <= postion_.y && postion_.y <= Screen::HEIGHT) {
+
+	}
+	else {
+		postion_.y = -64;
+	}
+
+	postion_.y += velocity_.y;
+
 	image->SetPosition(postion_);
 	image->SetRotation(rotation_);
 	image->SetScale(scale_);
