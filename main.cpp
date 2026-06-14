@@ -14,13 +14,18 @@
 
 #pragma comment(lib, "dxgi.lib")
 
-namespace {
+namespace GameFramework {
 	HWND hwnd = {};
+
+	HWND GetWindowHandle() {
+		return hwnd;
+	}
 }
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 using namespace DirectX3D;
+using namespace GameFramework;
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
 	if (ImGui_ImplWin32_WndProcHandler(hwnd, message, wParam, lParam))
@@ -69,7 +74,11 @@ void Draw() {
 	ObjectManager::UpdateManager();
 
 	auto currentScene = SceneManager::GetCurrentScene();
+	auto mousePos = Input::GetMousePoint();
+	auto& io = ImGui::GetIO();
 	ImGui::Begin("Game");
+	ImGui::Text("mousePos(Window): %d,%d", mousePos.x, mousePos.y);
+	ImGui::Text("ImGui mousePos(Screen): %2.2f,%2.2f", io.MousePos.x, io.MousePos.y);
 	ImGui::Text("current scene: %s", (currentScene == nullptr ? "(nullptr)" : currentScene->GetName().c_str()));
 	ImGui::Text("mouse-left: %d, mouse-center, %d, mouse-right: %d", Input::IsPushMouse(0), Input::IsPushMouse(2), Input::IsPushMouse(1));
 	ImGui::End();
@@ -77,7 +86,7 @@ void Draw() {
 	ImGui::EndFrame();
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-	if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
 		ImGui::UpdatePlatformWindows();
 		ImGui::RenderPlatformWindowsDefault();
 	}

@@ -1,5 +1,6 @@
 #include <dinput.h>
 #include "Input.h"
+#include "framework.h"
 #pragma comment(lib, "dinput8.lib")
 #pragma comment(lib, "dxguid.lib")
 
@@ -24,8 +25,9 @@ void Input::update() {
 
     mouseInputDevice_->Acquire();
     mouseInputDevice_->GetDeviceState(sizeof(mouseState_), &mouseState_);
-    mousePoint_.x += mouseState_.lX;
-    mousePoint_.y += mouseState_.lY;
+
+    GetCursorPos(&mousePoint_);
+    ScreenToClient(GameFramework::GetWindowHandle(), &mousePoint_);
 }
 
 void Input::release() {
@@ -46,4 +48,8 @@ bool Input::IsPushMouse(int button) {
         return true;
     }
     return false;
+}
+
+POINT Input::GetMousePoint() {
+    return mousePoint_;
 }

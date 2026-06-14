@@ -16,4 +16,5 @@ namespace Input {
 	bool IsPushKey(int key);
 	bool IsPushMouse(int button);
 	
+	POINT GetMousePoint();
 }
