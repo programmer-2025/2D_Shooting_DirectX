@@ -5,6 +5,7 @@
 #include "Enemy.h"
 #include "framework.h"
 #include "SceneManager.h"
+#include "FBX.h"
 
 namespace {
 	FontText* leftPointText = nullptr;
@@ -23,6 +24,8 @@ RunningScene::~RunningScene()
 void RunningScene::Init() {
 	new Player();
 	new Enemy();
+	FBX* fbx = new FBX();
+	fbx->Load("Oden.fbx");
 
 	leftPointText = new FontText(L"現在の得点", DirectX::XMFLOAT3(-350, -220, 0));
 	rightTimeText = new FontText(L"残り時間：", DirectX::XMFLOAT3(350, -220, 0));
