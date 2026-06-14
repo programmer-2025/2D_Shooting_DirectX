@@ -1,14 +1,21 @@
 #pragma once
 #include <Windows.h>
 #include <d3d11.h>
+#include <DirectXMath.h>
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "d3dcompiler.lib")
 
-struct Vertex {
-	float x, y, z;
+struct Color {
 	float r, g, b, a;
-	float u, v;
+
+
+};
+
+struct Vertex {
+	DirectX::XMFLOAT3 postion;
+	Color color;
+	DirectX::XMFLOAT2 uv;
 };
 
 enum VertexShaderType {

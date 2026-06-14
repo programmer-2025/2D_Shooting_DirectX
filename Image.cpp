@@ -21,13 +21,13 @@ Image::Image(const std::string& path, const float leftX, const float leftY)
 	//  |   / [3,4,5]|
 	//  |------------|
 
-	vertices_[0] = { 0.0f, 0.0f, 0.0f, 0,1,0,1, 0, 0 }; // 左上 
-	vertices_[1] = { 0.0f, leftY, 0.0f, 1,0,0,1, 0, 1 }; // 左下
-	vertices_[2] = { leftX, 0.0f, 0.0f, 0,0,1,1, 1, 0 }; // 右上
+	vertices_[0] = { {0.0f, 0.0f, 0.0f}, {0,1,0,1}, {0, 0} }; // 左上 
+	vertices_[1] = { {0.0f, leftY, 0.0f }, { 1,0,0,1 }, { 0, 1 }}; // 左下
+	vertices_[2] = { {leftX, 0.0f, 0.0f}, {0,0,1,1}, {1, 0} }; // 右上
 
-	vertices_[3] = { leftX, 0.0f, 0.0f, 0,0,1,1, 1, 0 }; // 右上
-	vertices_[4] = { leftX, leftY, 0.0f, 1,1,0,1, 1, 1 }; // 右下
-	vertices_[5] = { 0.0f, leftY, 0.0f, 1,0,0,1, 0, 1 }; // 左下
+	vertices_[3] = { {leftX, 0.0f, 0.0f}, {0,0,1,1}, {1, 0} }; // 右上
+	vertices_[4] = { {leftX, leftY, 0.0f }, { 1,1,0,1 }, { 1, 1 }}; // 右下
+	vertices_[5] = { {0.0f, leftY, 0.0f}, {1,0,0,1}, {0, 1} }; // 左下
 	
 }
 

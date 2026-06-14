@@ -63,16 +63,16 @@ void FBX::InitVertex(FbxMesh* mesh) {
 		for (int vertex = 0; vertex < 3; vertex++) {
 			int index = mesh->GetPolygonVertex(poly, vertex);
 			FbxVector4 pos = mesh->GetControlPointAt(index);
-			vertices_[index].x = (float)pos[0];
-			vertices_[index].y = (float)pos[1];
-			vertices_[index].z = (float)pos[2];
+			vertices_[index].postion.x = (float)pos[0];
+			vertices_[index].postion.y = (float)pos[1];
+			vertices_[index].postion.z = (float)pos[2];
 
 			FbxLayerElementUV* uvLayer = mesh->GetLayer(0)->GetUVs();
 			int uvIndex = mesh->GetTextureUVIndex(poly, vertex);
 			FbxVector2 uv = uvLayer->GetDirectArray().GetAt(uvIndex);
 
-			vertices_[index].u = (float)uv.mData[0];
-			vertices_[index].v = (float)(1.0f - uv.mData[1]);
+			vertices_[index].uv.x = (float)uv.mData[0];
+			vertices_[index].uv.y = (float)(1.0f - uv.mData[1]);
 		}
 	}
 

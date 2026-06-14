@@ -20,13 +20,13 @@ Texture::Texture(const std::string path, const float leftX, const float leftY)
 	path_ = path;
 
 	// スクリーン座標 → 画像の座標
-	vertices_[0] = { leftX, leftY + 1.0f, 0.0f, 0,1,0,1, 0, 0 }; // スクリーン座標: 左下 → 画像の座標: 左上 
-	vertices_[1] = { leftX, leftY, 0.0f, 1,0,0,1, 0, 1 }; // 左上 → 左下
-	vertices_[2] = { leftX + 1.0f, leftY, 0.0f, 1,1,0,1, 1, 1 }; // 右上 → 右下
+	vertices_[0] = { {leftX, leftY + 1.0f, 0.0f}, {0,1,0,1}, {0, 0} }; // スクリーン座標: 左下 → 画像の座標: 左上 
+	vertices_[1] = { {leftX, leftY, 0.0f }, { 1,0,0,1 }, { 0, 1 } }; // 左上 → 左下
+	vertices_[2] = { {leftX + 1.0f, leftY, 0.0f}, {1,1,0,1}, {1, 1} }; // 右上 → 右下
 
-	vertices_[3] = { leftX + 1.0f, leftY, 0.0f, 1,0,0,1, 1, 1 }; // 右上 → 右下
-	vertices_[4] = { leftX, leftY + 1.0f, 0.0f, 1,1,0,1, 0, 0 }; // 左下 → 左上
-	vertices_[5] = { leftX + 1.0f, leftY + 1.0f, 0.0f, 0,0,1,1, 1, 0 }; // 右下 → 右上
+	vertices_[3] = { {leftX + 1.0f, leftY, 0.0f}, {1,0,0,1}, {1, 1 } }; // 右上 → 右下
+	vertices_[4] = { {leftX, leftY + 1.0f, 0.0f}, {1,1,0,1}, {0, 0} }; // 左下 → 左上
+	vertices_[5] = { {leftX + 1.0f, leftY + 1.0f, 0.0f}, {0,0,1,1}, {1, 0} }; // 右下 → 右上
 }
 
 void Texture::Init() {
