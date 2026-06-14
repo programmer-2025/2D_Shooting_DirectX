@@ -1,7 +1,13 @@
 #pragma once
 #include "SceneBase.h"
+
+namespace {
+    const int GAME_TIME = 15;
+}
+
 class RunningScene : public SceneBase {
 private:
+    float time;
 public:
     RunningScene();
     ~RunningScene();
