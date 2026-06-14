@@ -13,12 +13,18 @@
 #define WINDOW_CLASS_NAME L"DirectX_Sample"
 
 #pragma comment(lib, "dxgi.lib")
+#pragma comment(lib,"Winmm.lib")
 
 namespace GameFramework {
 	HWND hwnd = {};
+	float deltaTime = 0.0f;
 
 	HWND GetWindowHandle() {
 		return hwnd;
+	}
+
+	float GetDeltaTime() {
+		return deltaTime;
 	}
 }
 
@@ -77,6 +83,7 @@ void Draw() {
 	auto mousePos = Input::GetMousePoint();
 	auto& io = ImGui::GetIO();
 	ImGui::Begin("Game");
+	ImGui::Text("DeltaTime: %2.2f", GameFramework::deltaTime);
 	ImGui::Text("mousePos(Window): %d,%d", mousePos.x, mousePos.y);
 	ImGui::Text("ImGui mousePos(Screen): %2.2f,%2.2f", io.MousePos.x, io.MousePos.y);
 	ImGui::Text("current scene: %s", (currentScene == nullptr ? "(nullptr)" : currentScene->GetName().c_str()));
@@ -98,6 +105,14 @@ void Update() {
 	Input::update();
 	auto currentScene = SceneManager::GetCurrentScene();
 	currentScene->Update();
+
+	static DWORD beforeTime = timeGetTime();
+	DWORD now = timeGetTime();
+	DWORD subt = now - beforeTime;
+
+	beforeTime = now;
+	GameFramework::deltaTime = (float) subt / 1000;
+	
 }
 
 int initializeWindow(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {

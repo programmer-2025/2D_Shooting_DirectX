@@ -10,4 +10,5 @@ namespace Screen {
 namespace GameFramework {
 
 	HWND GetWindowHandle();
+	float GetDeltaTime();
 }
